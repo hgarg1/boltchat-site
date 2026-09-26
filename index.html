@@ -5,10 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Boltchat — AI chat at the speed of thought</title>
   <meta name="description" content="Boltchat is a fast, focused Windows chat app for the open AI models on Groq: 400+ tokens per second, web search, a Python code runner, beautiful math and voice input.">
+  <link rel="canonical" href="https://boltchat.harshit-garg.com/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Boltchat">
   <meta property="og:title" content="Boltchat — AI chat at the speed of thought">
-  <meta property="og:description" content="A fast, focused Windows chat app for the open models on Groq.">
-  <meta property="og:image" content="https://boltchat.harshit-garg.com/assets/screenshot-math.png">
-  <meta name="theme-color" content="#07070a">
+  <meta property="og:description" content="Boltchat is a fast, focused Windows chat app for the open AI models on Groq: 400+ tokens per second, web search, a Python code runner, beautiful math and voice input.">
+  <meta property="og:url" content="https://boltchat.harshit-garg.com/">
+  <meta property="og:image" content="https://boltchat.harshit-garg.com/assets/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#07070a">
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#fbf9f7">
+  <link rel="apple-touch-icon" href="assets/icon.png">
   <link rel="icon" href="assets/favicon.png">
   <link rel="stylesheet" href="style.css">
 </head>
@@ -16,24 +25,29 @@
   <div class="aurora" aria-hidden="true"><span></span><span></span><span></span></div>
   <div class="grid-bg" aria-hidden="true"></div>
 
+  <a class="skip" href="#main">Skip to content</a>
   <header class="site-header">
-    <div class="wrap">
+    <div class="nav-shell">
       <a class="brand" href="./"><img src="assets/icon.png" alt="">Boltchat</a>
-      <nav class="nav">
-        <a href="#features">Features</a>
-        <a href="leadership.html">Leadership</a>
-        <a href="privacy.html">Privacy</a>
-        <a href="terms.html">Terms</a>
-        <a href="legal.html">Legal</a>
+      <nav class="nav" id="site-nav" aria-label="Main">
+        <span class="nav-indicator" aria-hidden="true"></span>
+          <a href="#features">Features</a>
+          <a href="leadership.html">Leadership</a>
+          <a href="privacy.html">Privacy</a>
+          <a href="terms.html">Terms</a>
+          <a href="legal.html">Legal</a>
       </nav>
+      <span class="nav-cta" title="Boltchat is coming soon to the Microsoft Store">⊞ Coming soon</span>
+      <button class="nav-toggle" type="button" aria-controls="site-nav" aria-expanded="false" aria-label="Open menu"><span></span><span></span></button>
+      <div class="nav-progress" aria-hidden="true"></div>
     </div>
   </header>
 
-  <main>
+  <main id="main">
     <section class="hero">
       <div class="wrap">
         <div class="badge reveal"><b>⚡ <span data-count="486">486</span> tok/s</b> measured on GPT-OSS 120B</div>
-        <img class="hero-icon" src="assets/icon.png" alt="Boltchat icon">
+        <img class="hero-icon" src="assets/icon.png" alt="" width="104" height="104">
         <h1 class="reveal" style="--d: .05s">AI chat at the <span class="shine">speed of thought</span></h1>
         <p class="lede reveal" style="--d: .12s">Boltchat is a focused Windows app for the open models on Groq. Answers stream in faster than you can read — with web search, a code runner, beautiful math and voice built in.</p>
         <div class="cta reveal" style="--d: .2s">
@@ -45,7 +59,7 @@
         <div class="stage">
           <div class="window">
             <div class="window-bar"><i></i><i></i><i></i><span>Boltchat</span></div>
-            <img src="assets/screenshot-math.png" alt="Boltchat deriving the quadratic formula, every equation typeset on a glowing card">
+            <img src="assets/screenshot-math.png" width="1280" height="800" fetchpriority="high" alt="Boltchat deriving the quadratic formula, every equation typeset on a glowing card">
           </div>
         </div>
       </div>
@@ -98,7 +112,7 @@
 
     <section class="section">
       <div class="wrap split">
-        <div class="window reveal"><div class="window-bar"><i></i><i></i><i></i><span>Boltchat · code runner</span></div><img src="assets/screenshot-tools.png" alt="Boltchat showing the Python it ran to answer a physics question"></div>
+        <div class="window reveal"><div class="window-bar"><i></i><i></i><i></i><span>Boltchat · code runner</span></div><img src="assets/screenshot-tools.png" width="1280" height="800" loading="lazy" decoding="async" alt="Boltchat showing the Python it ran to answer a physics question"></div>
         <div class="reveal" style="--d: .1s">
           <div class="eyebrow">Tools that show their work</div>
           <h2>Check every step</h2>
@@ -114,7 +128,7 @@
 
     <section class="wrap">
       <a class="founder reveal" href="leadership.html">
-        <img src="assets/harshit-garg.jpg" alt="Harshit Garg">
+        <img src="assets/harshit-garg.jpg" alt="Harshit Garg" width="64" height="64" loading="lazy" decoding="async">
         <span class="founder-text"><span class="eyebrow">Built by</span><strong>Harshit Garg</strong><span>Founder &amp; CEO</span></span>
         <span class="founder-cta">Meet the leadership →</span>
       </a>

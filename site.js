@@ -1,6 +1,53 @@
 // Small progressive enhancements; the site reads fine without them.
 const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+// ---------- Navbar ----------
+const header = document.querySelector('.site-header');
+const nav = document.querySelector('.nav');
+const indicator = document.querySelector('.nav-indicator');
+const toggle = document.querySelector('.nav-toggle');
+
+// Shrink into a tighter pill once you scroll, and fill the progress line as you read
+function onScroll() {
+  header?.classList.toggle('scrolled', scrollY > 16);
+  const max = document.documentElement.scrollHeight - innerHeight;
+  header?.style.setProperty('--progress', max > 0 ? Math.min(1, scrollY / max).toFixed(4) : 0);
+}
+addEventListener('scroll', onScroll, { passive: true });
+onScroll();
+
+// A soft pill glides to the hovered link and settles back on the current page
+if (nav && indicator) {
+  const current = nav.querySelector('[aria-current="page"]');
+  const moveTo = link => {
+    if (!link) {
+      indicator.style.opacity = '0';
+      return;
+    }
+    indicator.style.width = `${link.offsetWidth}px`;
+    indicator.style.transform = `translateX(${link.offsetLeft}px)`;
+    indicator.style.opacity = '1';
+  };
+  nav.querySelectorAll('a').forEach(a => a.addEventListener('pointerenter', () => moveTo(a)));
+  nav.addEventListener('pointerleave', () => moveTo(current));
+  // wait for fonts so the first measurement is right
+  (document.fonts?.ready || Promise.resolve()).then(() => moveTo(current));
+  addEventListener('resize', () => moveTo(current));
+}
+
+// Mobile: hamburger opens a drop-down sheet
+function setMenu(open) {
+  header.classList.toggle('open', open);
+  toggle.setAttribute('aria-expanded', String(open));
+  toggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+}
+if (toggle) {
+  toggle.addEventListener('click', () => setMenu(!header.classList.contains('open')));
+  nav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => setMenu(false)));
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') setMenu(false); });
+  document.addEventListener('click', e => { if (!header.contains(e.target)) setMenu(false); });
+}
+
 // Reveal elements as they scroll into view
 const revealer = new IntersectionObserver(entries => {
   for (const e of entries) {
@@ -58,6 +105,16 @@ if (demo) {
   const speed = document.querySelector('[data-demo-speed]');
   const caret = '<span class="caret"></span>';
   let started = false;
+  let onScreen = false;
+  let waiting = false; // a replay is due but the demo is off screen
+  new IntersectionObserver(entries => {
+    onScreen = entries[0].isIntersecting;
+    if (onScreen && waiting) {
+      waiting = false;
+      run();
+    }
+  }).observe(demo);
+  const replay = () => (onScreen ? run() : (waiting = true));
   const run = () => {
     let i = 0;
     const t0 = performance.now();
@@ -69,7 +126,7 @@ if (demo) {
       tokens.textContent = count;
       speed.textContent = secs > 0.05 ? Math.min(512, Math.round(count / secs)) : '—';
       if (i < words.length) setTimeout(step, 16);
-      else setTimeout(run, 3200);
+      else setTimeout(replay, 3200);
     };
     step();
   };

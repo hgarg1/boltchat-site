@@ -10,7 +10,24 @@
 <body>
   <div class="aurora" aria-hidden="true"><span></span><span></span><span></span></div>
   <div class="grid-bg" aria-hidden="true"></div>
-  <main class="hero">
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="nav-shell">
+      <a class="brand" href="/"><img src="/assets/icon.png" alt="">Boltchat</a>
+      <nav class="nav" id="site-nav" aria-label="Main">
+        <span class="nav-indicator" aria-hidden="true"></span>
+          <a href="/#features">Features</a>
+          <a href="/leadership.html">Leadership</a>
+          <a href="/privacy.html">Privacy</a>
+          <a href="/terms.html">Terms</a>
+          <a href="/legal.html">Legal</a>
+      </nav>
+      <span class="nav-cta" title="Boltchat is coming soon to the Microsoft Store">⊞ Coming soon</span>
+      <button class="nav-toggle" type="button" aria-controls="site-nav" aria-expanded="false" aria-label="Open menu"><span></span><span></span></button>
+      <div class="nav-progress" aria-hidden="true"></div>
+    </div>
+  </header>
+  <main id="main" class="hero">
     <div class="wrap">
       <img class="hero-icon" src="/assets/icon.png" alt="">
       <h1>Page <span class="shine">not found</span></h1>
@@ -18,5 +35,6 @@
       <div class="cta"><a class="btn primary" href="/">Back to Boltchat</a></div>
     </div>
   </main>
+  <script src="/site.js"></script>
 </body>
 </html>

@@ -5,9 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Leadership — Boltchat</title>
   <meta name="description" content="The people behind Boltchat. Harshit Garg is the Founder and CEO.">
+  <link rel="canonical" href="https://boltchat.harshit-garg.com/leadership.html">
+  <meta property="og:type" content="profile">
+  <meta property="og:site_name" content="Boltchat">
   <meta property="og:title" content="Leadership — Boltchat">
-  <meta property="og:image" content="https://boltchat.harshit-garg.com/assets/harshit-garg.jpg">
-  <meta name="theme-color" content="#07070a">
+  <meta property="og:description" content="The people behind Boltchat. Harshit Garg is the Founder and CEO.">
+  <meta property="og:url" content="https://boltchat.harshit-garg.com/leadership.html">
+  <meta property="og:image" content="https://boltchat.harshit-garg.com/assets/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#07070a">
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#fbf9f7">
+  <link rel="apple-touch-icon" href="assets/icon.png">
   <link rel="icon" href="assets/favicon.png">
   <link rel="stylesheet" href="style.css">
 </head>
@@ -15,16 +25,21 @@
   <div class="aurora" aria-hidden="true"><span></span><span></span><span></span></div>
   <div class="grid-bg" aria-hidden="true"></div>
 
+  <a class="skip" href="#main">Skip to content</a>
   <header class="site-header">
-    <div class="wrap">
+    <div class="nav-shell">
       <a class="brand" href="./"><img src="assets/icon.png" alt="">Boltchat</a>
-      <nav class="nav">
-        <a href="./#features">Features</a>
-        <a href="leadership.html" aria-current="page">Leadership</a>
-        <a href="privacy.html">Privacy</a>
-        <a href="terms.html">Terms</a>
-        <a href="legal.html">Legal</a>
+      <nav class="nav" id="site-nav" aria-label="Main">
+        <span class="nav-indicator" aria-hidden="true"></span>
+          <a href="./#features">Features</a>
+          <a href="leadership.html" aria-current="page">Leadership</a>
+          <a href="privacy.html">Privacy</a>
+          <a href="terms.html">Terms</a>
+          <a href="legal.html">Legal</a>
       </nav>
+      <span class="nav-cta" title="Boltchat is coming soon to the Microsoft Store">⊞ Coming soon</span>
+      <button class="nav-toggle" type="button" aria-controls="site-nav" aria-expanded="false" aria-label="Open menu"><span></span><span></span></button>
+      <div class="nav-progress" aria-hidden="true"></div>
     </div>
   </header>
 
@@ -36,7 +51,7 @@
     </div>
   </section>
 
-  <main class="section leaders">
+  <main id="main" class="section leaders">
     <div class="wrap">
       <article class="leader reveal" style="--d: .12s">
         <div class="leader-photo">
