@@ -360,6 +360,97 @@ code { font: 0.9em "Cascadia Code", Consolas, monospace; padding: 1px 6px; borde
 .toc a:hover { color: var(--text); background: var(--accent-soft); }
 .toc a.active { color: var(--accent); border-left-color: var(--accent); background: var(--accent-soft); }
 
+
+/* ---------- Leadership ---------- */
+.leaders { padding-top: 10px; }
+.leader {
+  display: grid;
+  grid-template-columns: 320px minmax(0, 1fr);
+  gap: 48px;
+  align-items: center;
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 36px;
+  border-radius: 28px;
+  border: 1px solid var(--border-strong);
+  background: radial-gradient(80% 120% at 0% 0%, var(--accent-soft), transparent 60%), var(--bg-elev);
+  backdrop-filter: blur(14px);
+  box-shadow: var(--shadow);
+}
+/* Photo sits inside a slowly rotating gradient ring */
+.leader-photo {
+  position: relative;
+  border-radius: 24px;
+  padding: 3px;
+  isolation: isolate;
+  overflow: hidden;
+}
+.leader-photo::before {
+  content: "";
+  position: absolute; inset: -50%;
+  background: conic-gradient(from var(--angle, 0deg), var(--accent), var(--accent-2), var(--accent-3), var(--accent));
+  animation: spin-ring 6s linear infinite;
+  z-index: -1;
+}
+.leader-photo img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  object-position: 50% 30%; /* frame face and shoulders, not the backdrop lettering */
+  border-radius: 21px;
+  transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.leader:hover .leader-photo img { transform: scale(1.03); }
+.leader-role {
+  display: inline-block;
+  padding: 5px 14px;
+  border-radius: 999px;
+  background: linear-gradient(120deg, var(--accent), var(--accent-2));
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.85em;
+  letter-spacing: 0.02em;
+}
+.leader-info h2 { font-size: clamp(2rem, 4vw, 2.8rem); letter-spacing: -0.035em; margin: 14px 0 12px; }
+.leader-info p { color: var(--muted); font-size: 1.05em; }
+.leader-links { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
+.leader-links .btn { padding: 10px 18px; font-size: 0.95em; }
+
+/* Home page teaser that leads to the leadership page */
+.founder {
+  display: flex; align-items: center; gap: 18px;
+  max-width: 640px;
+  margin: 20px auto 0;
+  padding: 14px 22px 14px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border-strong);
+  background: var(--bg-elev);
+  backdrop-filter: blur(12px);
+  color: var(--text);
+  text-decoration: none;
+  transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.3s, box-shadow 0.3s;
+}
+.founder:hover { transform: translateY(-3px); border-color: var(--accent); box-shadow: 0 18px 40px -20px var(--glow); }
+.founder img { width: 64px; height: 64px; border-radius: 50%; object-fit: cover; object-position: 50% 15%; box-shadow: 0 0 0 3px var(--accent-soft), 0 0 0 5px var(--accent); }
+.founder-text { display: flex; flex-direction: column; line-height: 1.3; }
+.founder-text .eyebrow { font-size: 0.7em; }
+.founder-text strong { font-size: 1.15em; }
+.founder-text span:last-child { color: var(--muted); font-size: 0.9em; }
+.founder-cta { margin-left: auto; color: var(--accent); font-weight: 650; white-space: nowrap; }
+
+@media (max-width: 800px) {
+  .leader { grid-template-columns: 1fr; padding: 22px; gap: 26px; }
+  .leader-photo { max-width: 300px; margin: 0 auto; width: 100%; }
+  .leader-info { text-align: center; }
+  .leader-links { justify-content: center; }
+}
+@media (max-width: 600px) {
+  .nav a[href="terms.html"], .nav a[href="legal.html"] { display: none; } /* both stay in the footer */
+  .founder { border-radius: 22px; flex-wrap: wrap; }
+  .founder-cta { margin-left: 82px; }
+}
+
 /* ---------- Footer ---------- */
 .site-footer { border-top: 1px solid var(--border); padding: 30px 0 44px; color: var(--faint); font-size: 0.9em; backdrop-filter: blur(10px); }
 .site-footer .wrap { display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: center; }
