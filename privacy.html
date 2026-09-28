@@ -52,7 +52,7 @@
 
   <main id="main" class="doc">
     <div class="wrap doc-layout">
-      <nav class="toc" aria-label="On this page"><strong>On this page</strong><a href="#who">Who we are</a><a href="#stored">Information stored on your PC</a><a href="#groq">Information sent to Groq</a><a href="#memory">Memory</a><a href="#news">News headlines</a><a href="#not">What we don't collect</a><a href="#reports">Reporting a response</a><a href="#store">Microsoft Store</a><a href="#choices">Your choices and deleting data</a><a href="#children">Children</a><a href="#changes">Changes to this policy</a><a href="#contact">Contact</a></nav>
+      <nav class="toc" aria-label="On this page"><strong>On this page</strong><a href="#who">Who we are</a><a href="#stored">Information stored on your PC</a><a href="#groq">Information sent to Groq</a><a href="#memory">Memory</a><a href="#news">News headlines</a><a href="#code">Code workspace</a><a href="#not">What we don't collect</a><a href="#reports">Reporting a response</a><a href="#store">Microsoft Store</a><a href="#choices">Your choices and deleting data</a><a href="#children">Children</a><a href="#changes">Changes to this policy</a><a href="#contact">Contact</a></nav>
       <article class="doc-body">
 
       <div class="callout">
@@ -68,6 +68,7 @@
         <tr><th>What</th><th>Why</th></tr>
         <tr><td>Your chats, including any images you attached</td><td>So you can reopen and search past conversations</td></tr>
         <tr><td>Settings (model, theme, system prompt, tool, memory and suggestion switches)</td><td>To remember your preferences</td></tr>
+        <tr><td>Code workspace: the list of folders you trusted, its AI conversations, AI changes waiting for review, and copies of files as they were before accepted AI changes</td><td>So you can pick up where you left off and undo AI changes (see <a href="#code">Code workspace</a>)</td></tr>
         <tr><td>Memories: short facts about you, if you turn memory on (see <a href="#memory">Memory</a>)</td><td>So answers can be personalised across chats</td></tr>
         <tr><td>The current start-screen suggestions</td><td>So the new-chat screen shows ideas immediately instead of waiting for new ones</td></tr>
         <tr><td>Your Groq API key</td><td>To talk to Groq on your behalf. A key you paste into the app is encrypted with Windows' built-in data protection tied to your Windows account. If you choose to put a key in a <code>.env</code> file yourself, it is stored as plain text in that file.</td></tr>
@@ -79,6 +80,7 @@
       <ul>
         <li>your messages, the earlier messages in that chat, and your system prompt;</li>
         <li>if memory is on, your saved memories, which are included with every message; and, if automatic learning is on, your latest message and the reply, sent once more so a model can pick out facts worth remembering;</li>
+        <li>in the Code workspace, when you ask the AI panel or use an inline AI edit: the names and contents of text files the model reads from the folder you opened, your search queries it runs, the name of the file you have open and any code you selected;</li>
         <li>if fresh start-screen ideas are on, the day's news headlines and (when memory is on) your memories, so a model can write the suggestion buttons;</li>
         <li>images you attach (vision models only);</li>
         <li>audio you record with the microphone button, which Groq transcribes with Whisper. The microphone is used only while you are recording;</li>
@@ -99,6 +101,17 @@
       <h2 id="news">News headlines</h2>
       <p>When <strong>Fresh start-screen ideas</strong> is on (Settings → Behavior, on by default), Boltchat downloads the public world-news RSS feeds of BBC News (UK), NPR, PBS NewsHour and the Christian Science Monitor (US), DW (Germany), France 24 (France) and CBC News (Canada) at most every few hours. On your PC, it merges reports of the same story and ranks stories by how many outlets cover them, then suggests a topical question on the new-chat screen. Each download is an ordinary web request: the outlet receives your IP address and basic technical details, as with any website, but no messages, memories or other information about you. Each outlet handles that request under its own privacy policy. Turn the setting off to stop these requests; the start screen then shows a fixed set of ideas.</p>
 
+      <h2 id="code">Code workspace</h2>
+      <p>The Code workspace lets you edit files in a folder on your PC and ask the AI to read and change them. It only works in folders you explicitly <strong>trust</strong> when opening them; Boltchat refuses any path outside such a folder, including through shortcuts and links.</p>
+      <ul>
+        <li>File contents leave your PC only when the model reads a file to answer a request you made, and then only to Groq. Opening or editing files yourself sends nothing.</li>
+        <li>Binary files (images, archives, programs, office documents and similar) are never read by the AI or sent anywhere.</li>
+        <li>Folders like <code>node_modules</code> and <code>.git</code>, and anything matched by the folder's <code>.gitignore</code>, are skipped when the AI lists or searches files.</li>
+        <li>AI changes are shown for your review before anything is saved, unless you choose to apply them automatically in Settings → Code. Files the AI or you delete go to the Windows Recycle Bin.</li>
+        <li>To let you undo AI changes, Boltchat keeps copies of the affected files, as they were before, in its app data folder.</li>
+      </ul>
+      <p>Remove a folder from Settings → Code to stop trusting it.</p>
+
       <h2 id="not">What we don't collect</h2>
       <p>Boltchat does not include analytics, advertising, crash-reporting or tracking code. It does not create an account, and it does not send your data to us or to anyone other than Groq. (The news headline downloads described above send no personal data.) This website does not use cookies or analytics.</p>
 
@@ -113,6 +126,7 @@
         <li>Delete any chat from the sidebar at any time.</li>
         <li>Remove your saved key in <strong>Settings → API key</strong>.</li>
         <li>Turn memory off, delete single memories or forget everything in <strong>Settings → Memory</strong>.</li>
+        <li>Stop trusting a folder in <strong>Settings → Code</strong>. Workspace conversations and undo copies are kept in the <code>workspaces</code> folder inside the app data folder; delete it to remove them.</li>
         <li>Turn off the news download in <strong>Settings → Behavior → Fresh start-screen ideas</strong>.</li>
         <li>Uninstalling removes the app; to remove everything, also delete the Boltchat folder in your app data (Settings → About → Open folder shows where it is).</li>
         <li>To remove data held by Groq, use your Groq account or contact Groq.</li>
