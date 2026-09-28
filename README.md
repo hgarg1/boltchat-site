@@ -27,7 +27,8 @@ Boltchat is a Windows desktop app that streams answers from the open models on [
 | ∑ **Beautiful math** | LaTeX, matrices and chemistry typeset with KaTeX |
 | 🎙 **Voice input** | Whisper transcription in well under a second |
 | ✦ **Memory** | Optional: remembers facts about you across chats — add, review and delete them in Settings |
-| ⌨ **Code workspace** | Monaco (VS Code) editor for trusted folders, with a LangGraph coding agent that plans, reads and edits files as diffs you review — with undo, resumable runs and inline Ctrl+K edits |
+| ⌨ **Code workspace** | Monaco (VS Code) editor for trusted folders, with a LangGraph coding agent that plans, reads and edits files as diffs you review, runs your tests behind a GPT-OSS 20B safety gate, and supports undo, resumable runs and inline Ctrl+K edits |
+| ▶ **Terminal & browser** | A real shell under the editor, and a built-in browser the agent drives to QA web pages (clicks, typing, console, vision checks) |
 | 📰 **Fresh ideas** | New-chat suggestions from your memories, today's top stories (merged from seven public-service newsrooms and ranked by coverage) and fun ideas |
 | 🔒 **Private** | No account, no tracking; chats and memories stay on your PC |
 

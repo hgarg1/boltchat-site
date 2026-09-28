@@ -52,7 +52,7 @@
 
   <main id="main" class="doc">
     <div class="wrap doc-layout">
-      <nav class="toc" aria-label="On this page"><strong>On this page</strong><a href="#who">Who we are</a><a href="#stored">Information stored on your PC</a><a href="#groq">Information sent to Groq</a><a href="#memory">Memory</a><a href="#news">News headlines</a><a href="#code">Code workspace</a><a href="#not">What we don't collect</a><a href="#reports">Reporting a response</a><a href="#store">Microsoft Store</a><a href="#choices">Your choices and deleting data</a><a href="#children">Children</a><a href="#changes">Changes to this policy</a><a href="#contact">Contact</a></nav>
+      <nav class="toc" aria-label="On this page"><strong>On this page</strong><a href="#who">Who we are</a><a href="#stored">Information stored on your PC</a><a href="#groq">Information sent to Groq</a><a href="#memory">Memory</a><a href="#news">News headlines</a><a href="#code">Code workspace</a><a href="#browser">Terminal and browser</a><a href="#not">What we don't collect</a><a href="#reports">Reporting a response</a><a href="#store">Microsoft Store</a><a href="#choices">Your choices and deleting data</a><a href="#children">Children</a><a href="#changes">Changes to this policy</a><a href="#contact">Contact</a></nav>
       <article class="doc-body">
 
       <div class="callout">
@@ -80,7 +80,7 @@
       <ul>
         <li>your messages, the earlier messages in that chat, and your system prompt;</li>
         <li>if memory is on, your saved memories, which are included with every message; and, if automatic learning is on, your latest message and the reply, sent once more so a model can pick out facts worth remembering;</li>
-        <li>in the Code workspace, when you ask the AI panel or use an inline AI edit: the names and contents of text files the model reads from the folder you opened, your search queries it runs, the name of the file you have open and any code you selected;</li>
+        <li>in the Code workspace, when you ask the AI panel or use an inline AI edit: the names and contents of text files the model reads from the folder you opened, your search queries it runs, the name of the file you have open and any code you selected; and, if you let the agent run commands, the commands it wants to run (sent to a small model on Groq for a safety check) and their output; and, if you let it use the built-in browser, the text of pages it checks and screenshots it asks a vision model on Groq to describe;</li>
         <li>if fresh start-screen ideas are on, the day's news headlines and (when memory is on) your memories, so a model can write the suggestion buttons;</li>
         <li>images you attach (vision models only);</li>
         <li>audio you record with the microphone button, which Groq transcribes with Whisper. The microphone is used only while you are recording;</li>
@@ -109,11 +109,20 @@
         <li>Folders like <code>node_modules</code> and <code>.git</code>, and anything matched by the folder's <code>.gitignore</code>, are skipped when the AI lists or searches files.</li>
         <li>AI changes are shown for your review before anything is saved, unless you choose to apply them automatically in Settings → Code. Files the AI or you delete go to the Windows Recycle Bin.</li>
         <li>To let you undo AI changes, Boltchat keeps copies of the affected files, as they were before, in its app data folder.</li>
+        <li><strong>Commands.</strong> If you allow it in Settings → Code, the agent can run commands (such as your tests) on your PC, in the opened folder, with your Windows account. Before a command runs, it is checked: clearly dangerous commands are blocked, and with "Smart gate" a small AI model on Groq (GPT-OSS 20B) reviews the command text to decide whether it runs, asks you first, or is blocked. With "Ask every time" you approve each one. Environment variables that look like keys, tokens or passwords are removed before a command runs. Command output is sent to Groq so the agent can read it.</li>
       </ul>
       <p>Remove a folder from Settings → Code to stop trusting it.</p>
 
+      <h2 id="browser">Terminal and browser</h2>
+      <p>The Code workspace has a built-in terminal and a built-in browser.</p>
+      <ul>
+        <li><strong>Terminal.</strong> It runs a normal shell (PowerShell or Command Prompt) on your PC in the opened folder. What you type and its output stay on your PC; the AI doesn't see your terminal.</li>
+        <li><strong>Browser.</strong> Pages you open load directly from their websites, as in any browser, in a separate browsing session with its own cookies and storage kept in Boltchat's app data folder. It has no access to your other browsers, blocks downloads and denies permission requests (camera, location and so on).</li>
+        <li><strong>The agent in the browser.</strong> If you allow it (Settings → Code, on by default), the coding agent can open local pages and files from the opened folder, click and type in them to test your project, and read the page's console messages. It needs your OK before opening any other website. Page text it reads is sent to Groq; when it checks how a page looks, a screenshot of the browser area is sent to a vision model on Groq.</li>
+      </ul>
+
       <h2 id="not">What we don't collect</h2>
-      <p>Boltchat does not include analytics, advertising, crash-reporting or tracking code. It does not create an account, and it does not send your data to us or to anyone other than Groq. (The news headline downloads described above send no personal data.) This website does not use cookies or analytics.</p>
+      <p>Boltchat does not include analytics, advertising, crash-reporting or tracking code. It does not create an account, and it does not send your data to us or to anyone other than Groq. (The news headline downloads described above send no personal data. Websites you or the agent open in the built-in browser receive what any website receives from a visitor.) This website does not use cookies or analytics.</p>
 
       <h2 id="reports">Reporting a response</h2>
       <p>If you use <strong>⚑ Report</strong> on a reply, Boltchat opens your own email app with a pre-filled message containing the reason, the model name, your prompt and the reply. Nothing is sent unless you choose to send that email. If you do, we use it only to understand and address the problem, and we delete it on request.</p>
