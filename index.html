@@ -20,6 +20,9 @@
   <link rel="apple-touch-icon" href="assets/icon.png">
   <link rel="icon" href="assets/favicon.png">
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="app-demo.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script>
 </head>
 <body>
   <div class="aurora" aria-hidden="true"><span></span><span></span><span></span></div>
@@ -59,7 +62,86 @@
         <div class="stage">
           <div class="window">
             <div class="window-bar"><i></i><i></i><i></i><span>Boltchat</span></div>
-            <img src="assets/screenshot-math.png" width="1280" height="800" fetchpriority="high" alt="Boltchat deriving the quadratic formula, every equation typeset on a glowing card">
+            <div class="app" data-demo="hero">
+              <p class="app-sr">Boltchat deriving the quadratic formula with every equation typeset on a glowing card, then switching to the Code workspace, where the agent plans a change, edits store.js, runs the tests and reports 8 of 8 passing.</p>
+              <div class="app-canvas" data-mode="chat" aria-hidden="true">
+                <div class="app-top">
+                  <div class="app-mode"><span class="app-mode-pill"></span><button type="button" data-go="chat" tabindex="-1">Chat</button><button type="button" data-go="code" tabindex="-1">Code</button></div>
+                  <span class="app-model">GPT OSS 120B</span>
+                  <span class="app-theme">◐</span>
+                </div>
+
+                <div class="scene scene-chat is-active" data-scene="chat" data-ms="620" data-hold="3400">
+                  <aside class="app-side">
+                    <div class="app-brand"><img src="assets/icon.png" alt="">Boltchat</div>
+                    <div class="app-new"><b>+</b> New chat</div>
+                    <div class="app-search">Search chats</div>
+                    <div class="app-label">Today</div>
+                    <div class="app-chat active">Derive the quadratic formula…</div>
+                    <div class="app-chat">A ball is thrown up at 20 m/s…</div>
+                    <div class="app-chat">Plan three days in Kyoto</div>
+                    <div class="app-settings">⚙ Settings</div>
+                  </aside>
+                  <div class="app-main">
+                    <div class="thread">
+                      <div class="bubble" data-at="1">Derive the quadratic formula by completing the square. Box the final result.</div>
+                      <div class="reasoning" data-at="2">Reasoning</div>
+                      <div class="math-card" data-at="3">
+                        <div class="math-row"><span>Start with the general quadratic</span><span data-tex="ax^2+bx+c=0,\quad a\neq 0">ax² + bx + c = 0,  a ≠ 0</span></div>
+                        <div class="math-row" data-at="4"><span>Divide by <i>a</i></span><span data-tex="x^2+\dfrac{b}{a}x+\dfrac{c}{a}=0">x² + (b/a)x + c/a = 0</span></div>
+                        <div class="math-row" data-at="5"><span>Complete the square</span><span data-tex="\left(x+\dfrac{b}{2a}\right)^2=\dfrac{b^2-4ac}{4a^2}">(x + b/2a)² = (b² − 4ac) / 4a²</span></div>
+                        <div class="math-row" data-at="6"><span>Take square roots</span><span data-tex="x+\dfrac{b}{2a}=\pm\dfrac{\sqrt{b^2-4ac}}{2a}">x + b/2a = ±√(b² − 4ac) / 2a</span></div>
+                        <div class="math-row result" data-at="7"><span data-tex="\boxed{x=\dfrac{-b\pm\sqrt{b^2-4ac}}{2a}}">x = (−b ± √(b² − 4ac)) / 2a</span></div>
+                      </div>
+                    </div>
+                    <div class="composer">
+                      <div class="composer-box">Message Boltchat…  (type / for commands)<span class="send">↑</span></div>
+                      <div class="composer-meta">GPT OSS 120B · 128k context window<span data-at="8"> · <b>⚡ 486 tok/s</b></span></div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="scene scene-code" data-scene="code" data-ms="850" data-hold="3800">
+                  <nav class="rail"><span class="active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg></span><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="6"/><path d="m20 20-4.5-4.5"/></svg></span><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/></svg></span><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg></span><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="m7 9 3 3-3 3M13 15h4"/></svg></span></nav>
+                  <div class="explorer">
+                    <div class="explorer-title">TODO-LIB</div>
+                    <div class="node"><span class="twisty open">›</span><svg class="folder" viewBox="0 0 16 16"><path fill="currentColor" d="M1.5 4A1.5 1.5 0 0 1 3 2.5h3.2l1.3 1.5H13A1.5 1.5 0 0 1 14.5 5.5V12A1.5 1.5 0 0 1 13 13.5H3A1.5 1.5 0 0 1 1.5 12z"/></svg>src</div>
+                    <div class="node child"><i class="i-js">JS</i>ids.js</div>
+                    <div class="node child"><i class="i-js">JS</i>index.js</div>
+                    <div class="node child selected"><i class="i-js">JS</i>store.js</div>
+                    <div class="node"><span class="twisty">›</span><svg class="folder" viewBox="0 0 16 16"><path fill="currentColor" d="M1.5 4A1.5 1.5 0 0 1 3 2.5h3.2l1.3 1.5H13A1.5 1.5 0 0 1 14.5 5.5V12A1.5 1.5 0 0 1 13 13.5H3A1.5 1.5 0 0 1 1.5 12z"/></svg>test</div>
+                    <div class="node"><i class="i-json">{}</i>package.json</div>
+                    <div class="node"><i class="i-md">M↓</i>README.md</div>
+                  </div>
+                  <div class="editor">
+                    <div class="tabs"><span class="tab active"><i class="i-js">JS</i>store.js</span><span class="tab"><i class="i-js">JS</i>run.js</span></div>
+                    <div class="crumbs">todo-lib › src › store.js</div>
+                    <div class="code"><span class="ln">  <span class="k">function</span> <span class="f">list</span>({ <span class="v">status</span> = <span class="s">'all'</span>, <span class="v">sort</span> = <span class="s">'created'</span> } = {}) {</span><span class="ln">    <span class="k">let</span> <span class="v">out</span> = <span class="v">todos</span>.<span class="f">filter</span>(<span class="v">t</span> =&gt; <span class="f">matches</span>(<span class="v">t</span>, <span class="v">status</span>));</span><span class="ln">    <span class="k">if</span> (<span class="v">sort</span> === <span class="s">'priority'</span>) <span class="v">out</span> = <span class="f">byPriority</span>(<span class="v">out</span>);</span><span class="ln add" data-at="4">    <span class="k">const</span> <span class="v">seen</span> = <span class="k">new</span> <span class="f">Set</span>();</span><span class="ln add" data-at="4">    <span class="v">out</span> = <span class="v">out</span>.<span class="f">filter</span>(<span class="v">t</span> =&gt; {</span><span class="ln add" data-at="4">      <span class="k">const</span> <span class="v">key</span> = <span class="v">t</span>.<span class="v">title</span>.<span class="f">toLowerCase</span>();</span><span class="ln add" data-at="4">      <span class="k">if</span> (<span class="v">seen</span>.<span class="f">has</span>(<span class="v">key</span>)) <span class="k">return</span> <span class="k">false</span>;</span><span class="ln add" data-at="4">      <span class="v">seen</span>.<span class="f">add</span>(<span class="v">key</span>);</span><span class="ln add" data-at="4">      <span class="k">return</span> <span class="k">true</span>;</span><span class="ln add" data-at="4">    });</span><span class="ln">    <span class="k">return</span> <span class="v">out</span>.<span class="f">map</span>(<span class="v">t</span> =&gt; ({ ...<span class="v">t</span> }));</span><span class="ln">  }</span></div>
+                    <div class="terminal">
+                      <span class="term-tab">1: powershell</span>
+                      <span class="term-line" data-at="5">PS todo-lib&gt; node test/run.js</span>
+                      <span class="term-line" data-at="6">ok   list dedupes titles, keeping first occurrence</span>
+                      <span class="term-line" data-at="6"><span class="ok">8/8 passed</span></span>
+                    </div>
+                  </div>
+                  <aside class="ai-panel">
+                    <div class="ai-head"><b>AI</b>Dedupe titles in list()</div>
+                    <div class="bubble" data-at="1">Make list() drop duplicate titles, keeping the first. Keep the tests green.</div>
+                    <div class="plan" data-at="2">
+                      <strong>Plan</strong>
+                      <span data-done="3">Read src/store.js</span>
+                      <span data-done="4">Dedupe titles in list()</span>
+                      <span data-done="6">Run the tests</span>
+                      <span data-done="7">Summarize the change</span>
+                    </div>
+                    <div class="step" data-at="3">📄 Read src/store.js</div>
+                    <div class="step" data-at="4">✎ Edited src/store.js <em>+7</em> <span class="del">−0</span></div>
+                    <div class="step" data-at="6">▶ Ran node test/run.js · <em>passed</em></div>
+                    <div class="ai-answer" data-at="7">Done: list() now keeps the first of each title (case-insensitive). All 8 tests pass.</div>
+                  </aside>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -118,7 +200,32 @@
 
     <section class="section">
       <div class="wrap split">
-        <div class="window reveal"><div class="window-bar"><i></i><i></i><i></i><span>Boltchat · code runner</span></div><img src="assets/screenshot-tools.png" width="1280" height="800" loading="lazy" decoding="async" alt="Boltchat showing the Python it ran to answer a physics question"></div>
+        <div class="window reveal">
+          <div class="window-bar"><i></i><i></i><i></i><span>Boltchat · code runner</span></div>
+          <div class="app app-compact" data-demo="tools">
+            <p class="app-sr">Boltchat answering a physics question: it shows the Python it ran, the exact output, and the formulas typeset on a glowing card.</p>
+            <div class="app-canvas" data-mode="chat" aria-hidden="true">
+              <div class="scene scene-chat is-active" data-scene="chat" data-ms="480" data-hold="4200">
+                <div class="thread">
+                  <div class="bubble" data-at="1"><span class="chip">⟳ Run code</span><br>A ball is thrown up at 20 m/s. Find the max height and time in the air (g = 9.81).</div>
+                  <div class="tool-card" data-at="2">
+                    <div class="tool-head"><span>Used the code runner · 1 Python run</span><b>✓</b></div>
+                    <div class="tool-body">
+                      <span>Ran Python</span>
+                      <div class="run-code"><span data-at="3"><span class="v">v0</span> = <span class="n">20.0</span></span><span data-at="4"><span class="v">g</span> = <span class="n">9.81</span></span><span data-at="5"><span class="v">t_up</span> = <span class="v">v0</span> / <span class="v">g</span></span><span data-at="6"><span class="v">h_max</span> = <span class="v">v0</span>**<span class="n">2</span> / (<span class="n">2</span>*<span class="v">g</span>)</span><span data-at="7"><span class="v">t_up</span>, <span class="v">h_max</span>, <span class="n">2</span>*<span class="v">t_up</span></span></div>
+                      <div class="run-out" data-at="8">(2.0387, 20.3874, 4.0775)</div>
+                    </div>
+                  </div>
+                  <div class="answer-head" data-at="9">Max height ≈ 20.39 m · time in the air ≈ 4.08 s</div>
+                  <div class="math-card" data-at="10">
+                    <div class="math-row"><span>Time to the top</span><span data-tex="t_{\uparrow}=\dfrac{v_0}{g}\approx 2.04\,\text{s}">t↑ = v₀ / g ≈ 2.04 s</span></div>
+                    <div class="math-row" data-at="11"><span>Maximum height</span><span data-tex="h_{\max}=\dfrac{v_0^2}{2g}\approx 20.39\,\text{m}">h_max = v₀² / 2g ≈ 20.39 m</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
         <div class="reveal" style="--d: .1s">
           <div class="eyebrow">Tools that show their work</div>
           <h2>Check every step</h2>

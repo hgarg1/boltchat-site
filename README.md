@@ -47,8 +47,9 @@ A dependency-free static site — no build step, no framework, no tracking.
 ├── legal.html          Legal & licenses ─┘
 ├── 404.html            Not-found page
 ├── style.css           All styles (dark + light themes, reduced-motion aware)
-├── site.js             Progressive enhancements: navbar, scroll reveal, demo, TOC
-├── assets/             Icon, screenshots, social image, leadership photo
+├── app-demo.css        The live app demos: Boltchat recreated in HTML/CSS, sharp at any size
+├── site.js             Progressive enhancements: navbar, scroll reveal, demos, TOC
+├── assets/             Icon, social image, leadership photo
 ├── robots.txt, sitemap.xml
 └── CNAME               Custom domain for GitHub Pages
 ```
@@ -70,7 +71,7 @@ DNS: a `CNAME` record for `boltchat` pointing to `hgarg1.github.io`.
 | To change… | Edit |
 |---|---|
 | Leadership bio or links | `leadership.html` (`.leader-info`) |
-| App screenshots | Replace `assets/screenshot-*.png` (1280×800, use a chat with no personal content) |
+| App demos (hero, code runner) | Markup in `index.html` (`.app[data-demo]`), styles in `app-demo.css`. `data-at="n"` shows an element at step n, `data-done="n"` ticks a plan item; `data-ms`/`data-hold` on a `.scene` set its pace. Math uses `data-tex` (KaTeX) with a plain-text fallback |
 | Policy wording | The page, **and** its "Effective"/"Updated" date near the top |
 | Social preview image | `assets/og-image.png` (1200×630) |
 | New page | Copy an existing page's `<head>`, header and footer; add it to `sitemap.xml` |

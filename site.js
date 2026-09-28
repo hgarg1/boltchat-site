@@ -142,6 +142,80 @@ if (demo) {
   }
 }
 
+// Live app demos: the app recreated in HTML (see app-demo.css), played step by step.
+// [data-at="n"] appears at step n and [data-done="n"] gets ticked off at step n; a demo with
+// several scenes moves to the next one after its last step and loops. The Chat/Code switch
+// in the hero is clickable. Only plays while on screen; reduced motion shows the finished state.
+const typeset = () => {
+  if (!window.katex) return;
+  document.querySelectorAll('[data-tex]').forEach(node => {
+    try {
+      katex.render(node.dataset.tex, node, { throwOnError: false });
+    } catch {
+      // keep the plain-text fallback
+    }
+  });
+};
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', typeset);
+else typeset();
+
+document.querySelectorAll('.app[data-demo]').forEach(app => {
+  const canvas = app.querySelector('.app-canvas');
+  const scenes = [...app.querySelectorAll('.scene')];
+  const lastStep = scene => Math.max(0, ...[...scene.querySelectorAll('[data-at], [data-done]')].map(n => Number(n.dataset.at || n.dataset.done)));
+  let index = 0;
+  let step = 0;
+  let timer = 0;
+  let onScreen = false;
+
+  const paint = () => {
+    const scene = scenes[index];
+    scene.querySelectorAll('[data-at]').forEach(n => n.classList.toggle('on', Number(n.dataset.at) <= step));
+    scene.querySelectorAll('[data-done]').forEach(n => n.classList.toggle('done', Number(n.dataset.done) <= step));
+  };
+  const show = i => {
+    index = i;
+    step = reduceMotion ? Infinity : 0;
+    canvas.dataset.mode = scenes[i].dataset.scene;
+    scenes.forEach((s, j) => s.classList.toggle('is-active', j === i));
+    paint();
+  };
+  const stop = () => {
+    clearTimeout(timer);
+    timer = 0;
+  };
+  const tick = () => {
+    stop();
+    if (!onScreen || reduceMotion) return;
+    const scene = scenes[index];
+    if (step < lastStep(scene)) {
+      step++;
+      paint();
+      timer = setTimeout(tick, Number(scene.dataset.ms) || 650);
+    } else {
+      timer = setTimeout(() => {
+        show((index + 1) % scenes.length);
+        timer = setTimeout(tick, 450);
+      }, Number(scene.dataset.hold) || 3200);
+    }
+  };
+
+  app.classList.add('js');
+  show(0);
+  app.querySelectorAll('[data-go]').forEach(button => button.addEventListener('click', () => {
+    const i = scenes.findIndex(s => s.dataset.scene === button.dataset.go);
+    if (i === -1) return;
+    stop();
+    show(i);
+    timer = setTimeout(tick, 300);
+  }));
+  new IntersectionObserver(entries => {
+    onScreen = entries[0].isIntersecting;
+    if (!onScreen) stop();
+    else if (!timer) timer = setTimeout(tick, 350);
+  }, { threshold: 0.25 }).observe(app);
+});
+
 // Legal pages: highlight the section you're reading in the table of contents
 const tocLinks = [...document.querySelectorAll('.toc a')];
 if (tocLinks.length) {
