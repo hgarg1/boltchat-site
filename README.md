@@ -26,7 +26,9 @@ Boltchat is a Windows desktop app that streams answers from the open models on [
 | 🐍 **Code runner** | `/code` — real Python for exact answers, with code and output shown |
 | ∑ **Beautiful math** | LaTeX, matrices and chemistry typeset with KaTeX |
 | 🎙 **Voice input** | Whisper transcription in well under a second |
-| 🔒 **Private** | No account, no tracking; chats stay on your PC |
+| ✦ **Memory** | Optional: remembers facts about you across chats — add, review and delete them in Settings |
+| 📰 **Fresh ideas** | New-chat suggestions from your memories, today's top stories (merged from seven public-service newsrooms and ranked by coverage) and fun ideas |
+| 🔒 **Private** | No account, no tracking; chats and memories stay on your PC |
 
 Boltchat is coming soon to the Microsoft Store. It needs your own Groq API key ([free tier available](https://console.groq.com/keys)).
 

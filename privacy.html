@@ -4,12 +4,12 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Privacy Policy — Boltchat</title>
-  <meta name="description" content="How Boltchat handles your data: no accounts, no tracking, chats stored on your PC, and requests sent only to Groq.">
+  <meta name="description" content="How Boltchat handles your data: no accounts, no tracking, chats and memories stored on your PC, messages sent only to Groq.">
   <link rel="canonical" href="https://boltchat.harshit-garg.com/privacy.html">
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="Boltchat">
   <meta property="og:title" content="Privacy Policy — Boltchat">
-  <meta property="og:description" content="How Boltchat handles your data: no accounts, no tracking, chats stored on your PC, and requests sent only to Groq.">
+  <meta property="og:description" content="How Boltchat handles your data: no accounts, no tracking, chats and memories stored on your PC, messages sent only to Groq.">
   <meta property="og:url" content="https://boltchat.harshit-garg.com/privacy.html">
   <meta property="og:image" content="https://boltchat.harshit-garg.com/assets/og-image.png">
   <meta property="og:image:width" content="1200">
@@ -46,17 +46,17 @@
     <div class="wrap">
       <span class="pill">Privacy</span>
       <h1>Privacy Policy</h1>
-      <p class="updated">Effective September 26, 2026</p>
+      <p class="updated">Effective September 27, 2026</p>
     </div>
   </section>
 
   <main id="main" class="doc">
     <div class="wrap doc-layout">
-      <nav class="toc" aria-label="On this page"><strong>On this page</strong><a href="#who">Who we are</a><a href="#stored">Information stored on your PC</a><a href="#groq">Information sent to Groq</a><a href="#not">What we don't collect</a><a href="#reports">Reporting a response</a><a href="#store">Microsoft Store</a><a href="#choices">Your choices and deleting data</a><a href="#children">Children</a><a href="#changes">Changes to this policy</a><a href="#contact">Contact</a></nav>
+      <nav class="toc" aria-label="On this page"><strong>On this page</strong><a href="#who">Who we are</a><a href="#stored">Information stored on your PC</a><a href="#groq">Information sent to Groq</a><a href="#memory">Memory</a><a href="#news">News headlines</a><a href="#not">What we don't collect</a><a href="#reports">Reporting a response</a><a href="#store">Microsoft Store</a><a href="#choices">Your choices and deleting data</a><a href="#children">Children</a><a href="#changes">Changes to this policy</a><a href="#contact">Contact</a></nav>
       <article class="doc-body">
 
       <div class="callout">
-        <p><strong>The short version:</strong> Boltchat has no accounts, no analytics and no servers of its own. Your chats are stored only on your PC. When you send a message, it goes directly from your PC to Groq, the AI provider you connect with your own API key.</p>
+        <p><strong>The short version:</strong> Boltchat has no accounts, no analytics and no servers of its own. Your chats — and, if you turn memory on, what Boltchat remembers about you — are stored only on your PC. When you send a message, it goes directly from your PC to Groq, the AI provider you connect with your own API key. The only other services the app contacts are a few public news websites, to download their lists of headlines; nothing about you is sent to them.</p>
       </div>
 
       <h2 id="who">Who we are</h2>
@@ -67,7 +67,9 @@
       <table>
         <tr><th>What</th><th>Why</th></tr>
         <tr><td>Your chats, including any images you attached</td><td>So you can reopen and search past conversations</td></tr>
-        <tr><td>Settings (model, theme, system prompt, tool switches)</td><td>To remember your preferences</td></tr>
+        <tr><td>Settings (model, theme, system prompt, tool, memory and suggestion switches)</td><td>To remember your preferences</td></tr>
+        <tr><td>Memories: short facts about you, if you turn memory on (see <a href="#memory">Memory</a>)</td><td>So answers can be personalised across chats</td></tr>
+        <tr><td>The current start-screen suggestions</td><td>So the new-chat screen shows ideas immediately instead of waiting for new ones</td></tr>
         <tr><td>Your Groq API key</td><td>To talk to Groq on your behalf. A key you paste into the app is encrypted with Windows' built-in data protection tied to your Windows account. If you choose to put a key in a <code>.env</code> file yourself, it is stored as plain text in that file.</td></tr>
       </table>
       <p>We never receive a copy of any of this.</p>
@@ -76,6 +78,8 @@
       <p>Boltchat sends requests <strong>directly from your PC to Groq, Inc.</strong> using your API key. Depending on what you do, a request can include:</p>
       <ul>
         <li>your messages, the earlier messages in that chat, and your system prompt;</li>
+        <li>if memory is on, your saved memories, which are included with every message; and, if automatic learning is on, your latest message and the reply, sent once more so a model can pick out facts worth remembering;</li>
+        <li>if fresh start-screen ideas are on, the day's news headlines and (when memory is on) your memories, so a model can write the suggestion buttons;</li>
         <li>images you attach (vision models only);</li>
         <li>audio you record with the microphone button, which Groq transcribes with Whisper. The microphone is used only while you are recording;</li>
         <li>when web search is used, the model's search queries — Groq performs the search and reads the pages;</li>
@@ -83,8 +87,20 @@
       </ul>
       <p>Groq processes this data under its own terms and privacy policy, which you agreed to when creating your Groq account. See <a href="https://groq.com" rel="noopener">groq.com</a> for details. We do not control and cannot see what Groq stores.</p>
 
+      <h2 id="memory">Memory</h2>
+      <p>Memory is <strong>off by default</strong>. When you turn it on in <strong>Settings → Memory</strong>, Boltchat keeps short facts about you in a file on your PC (<code>memory.json</code> in the app data folder). A memory is saved when:</p>
+      <ul>
+        <li>you add it yourself in Settings or with <code>/remember</code>;</li>
+        <li>you ask the model in a chat to remember something; or</li>
+        <li>"Learn automatically" is on, and a small model reading your latest message spots a lasting fact you shared about yourself. It is instructed to skip one-off requests, passwords and similar secrets, and sensitive topics such as health, finances, religion, politics and sexuality unless you ask it to remember them. Each learned memory is shown to you briefly and is labelled "learned" in the list.</li>
+      </ul>
+      <p>You can see, add and delete every memory in Settings → Memory, ask the model to forget something, or use <strong>Forget everything</strong>. Turning memory off stops memories being sent or learned; delete them as well if you don't want them kept on your PC. Memories are sent to Groq as described above and are never sent to us.</p>
+
+      <h2 id="news">News headlines</h2>
+      <p>When <strong>Fresh start-screen ideas</strong> is on (Settings → Behavior, on by default), Boltchat downloads the public world-news RSS feeds of BBC News (UK), NPR, PBS NewsHour and the Christian Science Monitor (US), DW (Germany), France 24 (France) and CBC News (Canada) at most every few hours. On your PC, it merges reports of the same story and ranks stories by how many outlets cover them, then suggests a topical question on the new-chat screen. Each download is an ordinary web request: the outlet receives your IP address and basic technical details, as with any website, but no messages, memories or other information about you. Each outlet handles that request under its own privacy policy. Turn the setting off to stop these requests; the start screen then shows a fixed set of ideas.</p>
+
       <h2 id="not">What we don't collect</h2>
-      <p>Boltchat does not include analytics, advertising, crash-reporting or tracking code. It does not create an account, and it does not send your data to us or to anyone other than Groq. This website does not use cookies or analytics.</p>
+      <p>Boltchat does not include analytics, advertising, crash-reporting or tracking code. It does not create an account, and it does not send your data to us or to anyone other than Groq. (The news headline downloads described above send no personal data.) This website does not use cookies or analytics.</p>
 
       <h2 id="reports">Reporting a response</h2>
       <p>If you use <strong>⚑ Report</strong> on a reply, Boltchat opens your own email app with a pre-filled message containing the reason, the model name, your prompt and the reply. Nothing is sent unless you choose to send that email. If you do, we use it only to understand and address the problem, and we delete it on request.</p>
@@ -96,6 +112,8 @@
       <ul>
         <li>Delete any chat from the sidebar at any time.</li>
         <li>Remove your saved key in <strong>Settings → API key</strong>.</li>
+        <li>Turn memory off, delete single memories or forget everything in <strong>Settings → Memory</strong>.</li>
+        <li>Turn off the news download in <strong>Settings → Behavior → Fresh start-screen ideas</strong>.</li>
         <li>Uninstalling removes the app; to remove everything, also delete the Boltchat folder in your app data (Settings → About → Open folder shows where it is).</li>
         <li>To remove data held by Groq, use your Groq account or contact Groq.</li>
       </ul>
