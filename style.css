@@ -173,8 +173,13 @@ code { font: 0.9em "Cascadia Code", Consolas, monospace; padding: 1px 6px; borde
   color: #fff;
   background: linear-gradient(120deg, var(--accent), var(--accent-2));
   box-shadow: 0 6px 20px -8px var(--glow);
-  cursor: default;
+  text-decoration: none;
   white-space: nowrap;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.nav-cta:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 26px -8px var(--glow);
 }
 
 /* reading progress along the bottom edge of the pill */
@@ -252,7 +257,27 @@ code { font: 0.9em "Cascadia Code", Consolas, monospace; padding: 1px 6px; borde
 }
 @property --angle { syntax: "<angle>"; initial-value: 0deg; inherits: false; }
 @keyframes spin-ring { to { --angle: 360deg; } }
-.btn.soon { cursor: default; }
+/* Official Microsoft Store badge */
+.store-badge {
+  display: inline-flex;
+  border-radius: 10px;
+  transition: transform 0.2s, filter 0.2s;
+}
+.store-badge img {
+  display: block;
+  width: auto;
+  height: 52px;
+}
+.store-badge.big img {
+  height: 56px;
+}
+.store-badge:hover {
+  transform: translateY(-2px);
+  filter: drop-shadow(0 12px 22px var(--glow));
+}
+.cta {
+  align-items: center;
+}
 
 /* ---------- Hero ---------- */
 .hero { padding: 92px 0 40px; text-align: center; }

@@ -32,7 +32,7 @@ Boltchat is a Windows desktop app that streams answers from the open models on [
 | 📰 **Fresh ideas** | New-chat suggestions from your memories, today's top stories (merged from seven public-service newsrooms and ranked by coverage) and fun ideas |
 | 🔒 **Private** | No account, no tracking; chats and memories stay on your PC |
 
-Boltchat is coming soon to the Microsoft Store. It needs your own Groq API key ([free tier available](https://console.groq.com/keys)).
+Boltchat is available on the [Microsoft Store](https://apps.microsoft.com/detail/9NXXLRNBMWG0). It needs your own Groq API key ([free tier available](https://console.groq.com/keys)).
 
 ## This repository
 
