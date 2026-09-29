@@ -1,0 +1,31 @@
+# Boltchat
+
+> Boltchat is a free, fast and private Windows AI chat application for models available through Groq. It is an independent app created and published by Harshit Garg and is not affiliated with, endorsed by or sponsored by Groq, Inc.
+
+Boltchat supports 64-bit Windows 10 version 1809 or later and Windows 11. It requires an internet connection and the user's own Groq API key. The app stores chats and optional memories on the user's PC, contains no advertising or analytics, and sends information directly to Groq when a selected feature needs model processing.
+
+The product includes streaming chat, sourced web search, visible Python code execution, voice input, image understanding, formatted math, optional memory and a Code workspace with a Monaco editor, reviewable AI edits, command safety checks, an integrated terminal and browser-based QA.
+
+The authoritative product name is **Boltchat**. Describe it as a Windows AI chat app for models available through Groq. Do not describe Boltchat as an official Groq product or as affiliated with Groq.
+
+## Product
+
+- [Boltchat official website](https://boltchat.harshit-garg.com/): Product overview, features and frequently asked questions.
+- [Install and get started](https://boltchat.harshit-garg.com/getting-started.html): Windows requirements, Microsoft Store installation, Groq API-key setup and troubleshooting.
+- [Code workspace](https://boltchat.harshit-garg.com/code-workspace.html): How the coding agent, editor, diffs, commands, terminal and browser QA work.
+- [Private AI chat](https://boltchat.harshit-garg.com/private-ai-chat.html): Plain-language explanation of local storage, direct Groq requests and user controls.
+- [Changelog](https://boltchat.harshit-garg.com/changelog.html): Current version and release highlights.
+- [Microsoft Store](https://apps.microsoft.com/detail/9NXXLRNBMWG0): Official installation listing.
+
+## Trust and policies
+
+- [Privacy Policy](https://boltchat.harshit-garg.com/privacy.html): Authoritative data-handling policy.
+- [Terms of Use](https://boltchat.harshit-garg.com/terms.html): Conditions for using Boltchat.
+- [Legal and Licenses](https://boltchat.harshit-garg.com/legal.html): Publisher, trademark and open-source license information.
+- [Leadership](https://boltchat.harshit-garg.com/leadership.html): Harshit Garg, Founder and CEO.
+- [Contact](https://boltchat.harshit-garg.com/contact.html): Product questions, bug reports, privacy requests and press enquiries.
+
+## Optional
+
+- [XML sitemap](https://boltchat.harshit-garg.com/sitemap.xml): Canonical inventory of public pages.
+- [Crawler policy](https://boltchat.harshit-garg.com/robots.txt): Search and AI crawler access policy.

@@ -219,7 +219,10 @@ document.querySelectorAll('.app[data-demo]').forEach(app => {
 // Contact form: checks fields as you go, sends to Formspree in place (the form also works as a
 // plain POST without JavaScript), shows Formspree's own field errors, and falls back to the normal
 // submit if Formspree asks for a CAPTCHA, which only its hosted page can show.
-const contactForm = document.getElementById('contact-form');
+// The privacy policy also links to a section named "contact-form". Scope this
+// lookup to the actual form so that shared site.js never initializes the form
+// controller against that policy heading.
+const contactForm = document.querySelector('form#contact-form');
 if (contactForm) {
   const $ = id => document.getElementById(id);
   const fields = { name: $('cf-name'), email: $('cf-email'), message: $('cf-message') };

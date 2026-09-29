@@ -3,26 +3,92 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Boltchat — AI chat at the speed of thought</title>
-  <meta name="description" content="Boltchat is a fast, focused Windows chat app for the open AI models on Groq: 400+ tokens per second, web search, a Python code runner, beautiful math, voice input, optional memory and a code workspace where AI edits your files with your review.">
+  <title>Boltchat — Fast, Private AI Chat for Windows</title>
+  <meta name="description" content="Boltchat is a fast, private Windows AI chat app for models on Groq, with web search, code execution, voice, vision, memory and a coding workspace.">
+  <meta name="robots" content="index, follow, max-image-preview:large">
   <link rel="canonical" href="https://boltchat.harshit-garg.com/">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Boltchat">
-  <meta property="og:title" content="Boltchat — AI chat at the speed of thought">
-  <meta property="og:description" content="Boltchat is a fast, focused Windows chat app for the open AI models on Groq: 400+ tokens per second, web search, a Python code runner, beautiful math, voice input, optional memory and a code workspace where AI edits your files with your review.">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:title" content="Boltchat — Fast, Private AI Chat for Windows">
+  <meta property="og:description" content="Fast, private Windows AI chat for models on Groq, with web search, code execution, voice, vision, memory and a coding workspace.">
   <meta property="og:url" content="https://boltchat.harshit-garg.com/">
   <meta property="og:image" content="https://boltchat.harshit-garg.com/assets/og-image.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Boltchat, a fast and private AI chat app for Windows">
   <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Boltchat — Fast, Private AI Chat for Windows">
+  <meta name="twitter:description" content="Fast Windows AI chat for models on Groq, with useful tools and local-first privacy.">
+  <meta name="twitter:image" content="https://boltchat.harshit-garg.com/assets/og-image.png">
+  <meta name="twitter:image:alt" content="Boltchat, a fast and private AI chat app for Windows">
   <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#07070a">
   <meta name="theme-color" media="(prefers-color-scheme: light)" content="#fbf9f7">
   <link rel="apple-touch-icon" href="assets/icon.png">
   <link rel="icon" href="assets/favicon.png">
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="app-demo.css">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="preconnect" href="https://get.microsoft.com" crossorigin>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous">
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": "https://boltchat.harshit-garg.com/#website",
+        "url": "https://boltchat.harshit-garg.com/",
+        "name": "Boltchat",
+        "description": "The official website for Boltchat, a fast and private AI chat app for Windows.",
+        "inLanguage": "en-US"
+      },
+      {
+        "@type": "SoftwareApplication",
+        "@id": "https://boltchat.harshit-garg.com/#software",
+        "name": "Boltchat",
+        "url": "https://boltchat.harshit-garg.com/",
+        "downloadUrl": "https://apps.microsoft.com/detail/9NXXLRNBMWG0",
+        "description": "A fast, private Windows AI chat app for models available through Groq, with web search, code execution, voice, vision, optional memory and a reviewable coding workspace.",
+        "image": "https://boltchat.harshit-garg.com/assets/og-image.png",
+        "operatingSystem": "Windows 10, Windows 11",
+        "applicationCategory": "UtilitiesApplication",
+        "applicationSubCategory": "AI chat client",
+        "softwareRequirements": "Windows 10 version 1809 or later or Windows 11, 64-bit; internet connection; Groq API key",
+        "featureList": [
+          "Streaming AI chat",
+          "Web search with sources",
+          "Python code execution",
+          "Voice input and image understanding",
+          "Optional local memory",
+          "Code workspace with reviewable AI edits"
+        ],
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD",
+          "availability": "https://schema.org/InStock",
+          "url": "https://apps.microsoft.com/detail/9NXXLRNBMWG0"
+        },
+        "author": {
+          "@type": "Person",
+          "@id": "https://boltchat.harshit-garg.com/leadership.html#harshit-garg",
+          "name": "Harshit Garg",
+          "url": "https://harshit-garg.com"
+        },
+        "publisher": {
+          "@type": "Person",
+          "@id": "https://boltchat.harshit-garg.com/leadership.html#harshit-garg",
+          "name": "Harshit Garg"
+        },
+        "license": "https://opensource.org/license/mit",
+        "isAccessibleForFree": true,
+        "sameAs": "https://apps.microsoft.com/detail/9NXXLRNBMWG0"
+      }
+    ]
+  }
+  </script>
 </head>
 <body>
   <div class="aurora" aria-hidden="true"><span></span><span></span><span></span></div>
@@ -31,7 +97,7 @@
   <a class="skip" href="#main">Skip to content</a>
   <header class="site-header">
     <div class="nav-shell">
-      <a class="brand" href="./"><img src="assets/icon.png" alt="">Boltchat</a>
+      <a class="brand" href="./"><img src="assets/icon-128.png" alt="" width="30" height="30">Boltchat</a>
       <nav class="nav" id="site-nav" aria-label="Main">
         <span class="nav-indicator" aria-hidden="true"></span>
           <a href="#features">Features</a>
@@ -51,9 +117,9 @@
     <section class="hero">
       <div class="wrap">
         <div class="badge reveal"><b>⚡ <span data-count="486">486</span> tok/s</b> measured on GPT-OSS 120B</div>
-        <img class="hero-icon" src="assets/icon.png" alt="" width="104" height="104">
+        <img class="hero-icon" src="assets/icon-128.png" alt="" width="104" height="104" fetchpriority="high">
         <h1 class="reveal" style="--d: .05s">AI chat at the <span class="shine">speed of thought</span></h1>
-        <p class="lede reveal" style="--d: .12s">Boltchat is a focused Windows app for the open models on Groq. Answers stream in faster than you can read — with web search, a code runner, beautiful math, voice and an optional memory built in.</p>
+        <p class="lede reveal" style="--d: .12s">Boltchat is a focused Windows app for models available through Groq. Answers stream in faster than you can read — with web search, a code runner, beautiful math, voice and an optional memory built in.</p>
         <div class="cta reveal" style="--d: .2s">
           <a class="store-badge" href="https://apps.microsoft.com/detail/9NXXLRNBMWG0" rel="noopener"><picture><source srcset="https://get.microsoft.com/images/en-us%20light.svg" media="(prefers-color-scheme: light)"><img src="https://get.microsoft.com/images/en-us%20dark.svg" width="200" height="72" alt="Download from the Microsoft Store"></picture></a>
           <a class="btn" href="#demo">Watch it stream ↓</a>
@@ -74,7 +140,7 @@
 
                 <div class="scene scene-chat is-active" data-scene="chat" data-ms="620" data-hold="3400">
                   <aside class="app-side">
-                    <div class="app-brand"><img src="assets/icon.png" alt="">Boltchat</div>
+                    <div class="app-brand"><img src="assets/icon-128.png" alt="" width="22" height="22">Boltchat</div>
                     <div class="app-new"><b>+</b> New chat</div>
                     <div class="app-search">Search chats</div>
                     <div class="app-label">Today</div>
@@ -170,11 +236,47 @@
           <div class="card reveal" style="--d: .24s"><div class="ico">🎙</div><h3>Voice input</h3><p>Speak instead of typing — Whisper transcribes you in well under a second.</p></div>
           <div class="card reveal" style="--d: .3s"><div class="ico">✦</div><h3>Remembers you</h3><p>Turn on memory and answers get more personal over time. Say “remember that…”, and see or delete every memory in Settings.</p></div>
           <div class="card reveal" style="--d: .36s"><div class="ico">📰</div><h3>Fresh ideas</h3><p>The new-chat screen suggests things to ask, drawn from your memories, the day's top stories from seven public-service newsrooms in five countries — ranked by how many independently cover them — and a few fun ideas.</p></div>
-          <div class="card reveal" style="--d: .42s"><div class="ico">⌨</div><h3>Code workspace</h3><p>Open a folder in the editor that powers VS Code, with search, tabs and syntax highlighting for 80+ languages.</p></div>
+          <div class="card reveal" style="--d: .42s"><div class="ico">⌨</div><h3>Code workspace</h3><p>Open a folder in the editor that powers VS Code, with search, tabs and syntax highlighting for 80+ languages.</p><a class="card-link" href="code-workspace.html">Explore the Code workspace →</a></div>
           <div class="card reveal" style="--d: .48s"><div class="ico">✎</div><h3>A coding agent</h3><p>Describe a task; the agent plans it, reads your code, makes the changes and runs your tests to check them. A safety check guards every command, and every change can be undone.</p></div>
           <div class="card reveal" style="--d: .54s"><div class="ico">▶</div><h3>Built-in terminal</h3><p>A real PowerShell or Command Prompt in your project folder, in tabs under the editor. The agent's own commands show up in their own tab.</p></div>
           <div class="card reveal" style="--d: .6s"><div class="ico">🌐</div><h3>Browser QA</h3><p>A built-in browser the agent can drive: it opens your pages, clicks, types, reads console errors and asks a vision model whether things look right.</p></div>
-          <div class="card reveal" style="--d: .66s"><div class="ico">🔒</div><h3>Private by design</h3><p>No account, no tracking. Chats, memories and files stay on your PC; the AI only reads folders you trust.</p></div>
+          <div class="card reveal" style="--d: .66s"><div class="ico">🔒</div><h3>Private by design</h3><p>No account, no tracking. Chats, memories and files stay on your PC; the AI only reads folders you trust.</p><a class="card-link" href="private-ai-chat.html">Understand Boltchat privacy →</a></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="faq">
+      <div class="wrap faq-wrap">
+        <div class="center reveal">
+          <div class="eyebrow">Straight answers</div>
+          <h2>Frequently asked questions</h2>
+          <p class="sub">What you need to know before installing Boltchat.</p>
+        </div>
+        <div class="faq-list reveal" style="--d: .08s">
+          <details>
+            <summary>What is Boltchat?</summary>
+            <p>Boltchat is a free Windows desktop app for chatting with models available through Groq. It adds web search, Python code execution, voice input, image understanding, optional memory and a coding workspace around those models.</p>
+          </details>
+          <details>
+            <summary>Is Boltchat made by or affiliated with Groq?</summary>
+            <p>No. Boltchat is an independent app created and published by Harshit Garg. It connects directly to Groq using the API key you provide, but it is not affiliated with, endorsed by or sponsored by Groq, Inc.</p>
+          </details>
+          <details>
+            <summary>Do I need a Groq API key?</summary>
+            <p>Yes. Boltchat uses your own Groq API key, which you can create from your Groq account. A free Groq tier may be available, subject to Groq's current limits and terms.</p>
+          </details>
+          <details>
+            <summary>Is Boltchat free?</summary>
+            <p>The Boltchat app is free to install from the Microsoft Store. Your use of Groq is governed separately by Groq's limits, pricing and terms.</p>
+          </details>
+          <details>
+            <summary>Which versions of Windows are supported?</summary>
+            <p>Boltchat supports 64-bit Windows 10 version 1809 or later and Windows 11. An internet connection is required because the AI models run on Groq's servers.</p>
+          </details>
+          <details>
+            <summary>Where are my chats and API key stored?</summary>
+            <p>Chats and optional memories are stored on your PC. An API key entered in the app is protected with Windows data protection. Messages and selected content are sent directly to Groq when needed to answer your requests. Read the <a href="privacy.html">full privacy policy</a> for exact details.</p>
+          </details>
         </div>
       </div>
     </section>
@@ -242,7 +344,7 @@
 
     <section class="wrap">
       <a class="founder reveal" href="leadership.html">
-        <img src="assets/harshit-garg.jpg" alt="Harshit Garg" width="64" height="64" loading="lazy" decoding="async">
+        <img src="assets/harshit-garg-450.jpg" alt="Harshit Garg" width="64" height="64" loading="lazy" decoding="async">
         <span class="founder-text"><span class="eyebrow">Built by</span><strong>Harshit Garg</strong><span>Founder &amp; CEO</span></span>
         <span class="founder-cta">Meet the leadership →</span>
       </a>
@@ -258,6 +360,7 @@
           <a class="btn" href="https://console.groq.com/keys" rel="noopener">Get a free Groq key →</a>
           <a class="btn" href="contact.html">Say hello</a>
         </div>
+        <p class="fine"><a href="getting-started.html">Read the installation and getting-started guide →</a></p>
       </div>
     </section>
   </main>
@@ -266,6 +369,9 @@
     <div class="wrap">
       <span>© 2026 Harshit Garg (Boltchat). All rights reserved. · Not affiliated with Groq, Inc.</span>
       <nav>
+        <a href="getting-started.html">Getting started</a>
+        <a href="code-workspace.html">Code workspace</a>
+        <a href="changelog.html">Changelog</a>
         <a href="leadership.html">Leadership</a>
         <a href="privacy.html">Privacy</a>
         <a href="terms.html">Terms</a>

@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Boltchat Code Workspace — Reviewable AI Coding on Windows</title>
+  <meta name="description" content="Explore Boltchat's Windows Code workspace: a Monaco editor, coding agent, reviewable diffs, command safety checks, terminal and browser-based testing.">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <link rel="canonical" href="https://boltchat.harshit-garg.com/code-workspace.html">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Boltchat">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:title" content="Boltchat Code Workspace — Reviewable AI Coding on Windows">
+  <meta property="og:description" content="A Windows coding workspace with reviewable AI edits, command safety checks, a terminal and browser-based testing.">
+  <meta property="og:url" content="https://boltchat.harshit-garg.com/code-workspace.html">
+  <meta property="og:image" content="https://boltchat.harshit-garg.com/assets/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Boltchat, a fast and private AI chat app for Windows">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Boltchat Code Workspace">
+  <meta name="twitter:description" content="Reviewable AI coding on Windows, with a real editor, terminal and browser QA.">
+  <meta name="twitter:image" content="https://boltchat.harshit-garg.com/assets/og-image.png">
+  <meta name="twitter:image:alt" content="Boltchat, a fast and private AI chat app for Windows">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#07070a">
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#fbf9f7">
+  <link rel="apple-touch-icon" href="assets/icon.png">
+  <link rel="icon" href="assets/favicon.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="aurora" aria-hidden="true"><span></span><span></span><span></span></div>
+  <div class="grid-bg" aria-hidden="true"></div>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="nav-shell">
+      <a class="brand" href="./"><img src="assets/icon-128.png" alt="" width="30" height="30">Boltchat</a>
+      <nav class="nav" id="site-nav" aria-label="Main">
+        <span class="nav-indicator" aria-hidden="true"></span>
+        <a href="./#features">Features</a>
+        <a href="getting-started.html">Get started</a>
+        <a href="code-workspace.html" aria-current="page">Code workspace</a>
+        <a href="privacy.html">Privacy</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+      <a class="nav-cta" href="https://apps.microsoft.com/detail/9NXXLRNBMWG0" rel="noopener" title="Get Boltchat from the Microsoft Store"><svg class="nav-cta-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11"/><path d="m7 10.5 5 5 5-5"/><path d="M5 20h14"/></svg>Get the app</a>
+      <button class="nav-toggle" type="button" aria-controls="site-nav" aria-expanded="false" aria-label="Open menu"><span></span><span></span></button>
+      <div class="nav-progress" aria-hidden="true"></div>
+    </div>
+  </header>
+
+  <section class="doc-hero">
+    <div class="wrap">
+      <span class="pill">Product guide</span>
+      <h1>AI coding with every change in view</h1>
+      <p class="updated">The Boltchat Code workspace for Windows</p>
+    </div>
+  </section>
+
+  <main id="main" class="doc">
+    <div class="wrap doc-layout">
+      <nav class="toc" aria-label="On this page"><strong>On this page</strong><a href="#overview">Overview</a><a href="#workflow">Workflow</a><a href="#review">Review and undo</a><a href="#commands">Command safety</a><a href="#terminal">Terminal</a><a href="#browser">Browser QA</a><a href="#privacy">Privacy</a><a href="#limits">Limits</a></nav>
+      <article class="doc-body">
+        <p class="guide-intro">Boltchat combines a Monaco code editor with an AI agent that can plan work, inspect a project, propose file changes and run relevant checks. You stay in control of the folder, commands and edits.</p>
+
+        <h2 id="overview">A local workspace around your project</h2>
+        <div class="guide-grid">
+          <div class="guide-card"><h3>Real editor</h3><p>Tabs, project search, syntax highlighting for more than 80 languages and the editing engine used by Visual Studio Code.</p></div>
+          <div class="guide-card"><h3>Task planning</h3><p>The agent turns a request into visible steps and updates its plan as work progresses.</p></div>
+          <div class="guide-card"><h3>Reviewable edits</h3><p>AI changes appear as diffs that you can inspect before accepting, with undo for accepted work.</p></div>
+          <div class="guide-card"><h3>Verification</h3><p>The agent can run tests, inspect console output and use a built-in browser to check web projects.</p></div>
+        </div>
+
+        <h2 id="workflow">How a coding task works</h2>
+        <ol class="steps">
+          <li><strong>Open and trust a folder.</strong> Boltchat only gives the agent project access after you explicitly select and trust that folder.</li>
+          <li><strong>Describe a concrete outcome.</strong> Ask for a bug fix, feature, refactor, explanation or test. The agent creates a plan before making broad changes.</li>
+          <li><strong>The agent reads what it needs.</strong> It searches and opens relevant text files rather than sending the entire project automatically.</li>
+          <li><strong>Review proposed changes.</strong> File edits are shown as additions and removals. You can accept, reject or undo them.</li>
+          <li><strong>Check the result.</strong> With permission, the agent runs the project's tests or build and can inspect a local web page.</li>
+        </ol>
+
+        <h2 id="review">Review, branches and undo</h2>
+        <p>AI edits do not silently replace the conversation that produced them. Edited messages and regenerated answers retain earlier alternatives as branches, and file checkpoints support undo after accepted changes. You should still keep normal project backups or version control for important work.</p>
+        <div class="callout"><p><strong>Your responsibility:</strong> AI-generated code can be wrong, insecure or incomplete. Read meaningful diffs and run the project's own checks before shipping.</p></div>
+
+        <h2 id="commands">Command safety</h2>
+        <p>The coding agent cannot run arbitrary commands without a gate. Boltchat checks every proposed command, blocks clearly dangerous patterns and can ask for your approval. Settings let you require approval every time or use the smart gate for routine project commands.</p>
+        <ul>
+          <li>Commands run with your Windows account inside the opened project folder.</li>
+          <li>Environment variables whose names look like keys, tokens or passwords are removed before an agent command runs.</li>
+          <li>Command output is shown in Boltchat and sent to Groq so the agent can interpret the result.</li>
+          <li>You should decline any command you do not understand.</li>
+        </ul>
+
+        <h2 id="terminal">A real integrated terminal</h2>
+        <p>The workspace includes PowerShell or Command Prompt tabs rooted in the project folder. Your terminals and the agent's command output remain visible beneath the editor, so you can reproduce checks or continue manually.</p>
+
+        <h2 id="browser">Browser-based QA for web projects</h2>
+        <p>When enabled, the agent can open local project pages or a development server in Boltchat's built-in browser, interact with the page, read console messages and ask a vision-capable model to describe a screenshot. Opening unrelated external websites requires your approval.</p>
+
+        <h2 id="privacy">What leaves your PC</h2>
+        <p>Your project remains on your PC, but content must be sent to Groq when the model needs it. That can include the text of files the agent reads, your selected code, filenames, search queries, proposed commands, command output, browser text and screenshots requested for visual checking. Boltchat does not operate an intermediary server.</p>
+        <p>See <a href="privacy.html#code">Code workspace privacy</a> and <a href="privacy.html#browser">terminal and browser privacy</a> for the precise policy.</p>
+
+        <h2 id="limits">What the agent cannot promise</h2>
+        <ul>
+          <li>It cannot guarantee that a change is correct merely because tests pass.</li>
+          <li>It cannot use tools that are not installed on your computer.</li>
+          <li>It should not be given access to folders containing secrets or unrelated sensitive data.</li>
+          <li>It does not replace code review, backups, version control or security testing.</li>
+        </ul>
+        <p>Ready to try it? Follow the <a href="getting-started.html">Boltchat installation guide</a>.</p>
+      </article>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <span>© 2026 Harshit Garg (Boltchat). All rights reserved. · Not affiliated with Groq, Inc.</span>
+      <nav>
+        <a href="./">Home</a>
+        <a href="getting-started.html">Getting started</a>
+        <a href="private-ai-chat.html">Privacy overview</a>
+        <a href="changelog.html">Changelog</a>
+        <a href="terms.html">Terms</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+    </div>
+  </footer>
+  <script src="site.js"></script>
+</body>
+</html>

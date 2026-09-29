@@ -41,6 +41,10 @@ A dependency-free static site — no build step, no framework, no tracking.
 ```
 .
 ├── index.html          Landing page (hero, features, live streaming demo)
+├── getting-started.html Installation, first-run and troubleshooting guide
+├── code-workspace.html  Detailed Code workspace product guide
+├── private-ai-chat.html Plain-language privacy and data-flow overview
+├── changelog.html       Current release notes
 ├── leadership.html     Leadership team
 ├── privacy.html        Privacy policy  ─┐
 ├── terms.html          Terms of use     ├─ linked from the Microsoft Store listing and the app
@@ -51,7 +55,9 @@ A dependency-free static site — no build step, no framework, no tracking.
 ├── app-demo.css        The live app demos: Boltchat recreated in HTML/CSS, sharp at any size
 ├── site.js             Progressive enhancements: navbar, scroll reveal, demos, TOC
 ├── assets/             Icon, social image, leadership photo
-├── robots.txt, sitemap.xml
+├── scripts/             SEO validation and IndexNow notification
+├── .github/workflows/   Automated SEO checks and discovery notification
+├── robots.txt, sitemap.xml, llms.txt
 └── CNAME               Custom domain for GitHub Pages
 ```
 
@@ -67,6 +73,17 @@ Then open http://localhost:3000. (Any static file server works; opening the HTML
 Every push to `main` is published by **GitHub Pages** to https://boltchat.harshit-garg.com, with HTTPS enforced.
 DNS: a `CNAME` record for `boltchat` pointing to `hgarg1.github.io`.
 
+The `SEO and discovery` workflow validates every pull request and push. After a
+push to `main`, it also tells IndexNow which public URLs changed. The verification
+key is intentionally public at the site root, as required by the IndexNow protocol.
+
+Run the same checks locally before committing:
+
+```bash
+node scripts/check-seo.mjs
+node scripts/indexnow.mjs --dry-run
+```
+
 ### Common edits
 
 | To change… | Edit |
@@ -75,7 +92,10 @@ DNS: a `CNAME` record for `boltchat` pointing to `hgarg1.github.io`.
 | App demos (hero, code runner) | Markup in `index.html` (`.app[data-demo]`), styles in `app-demo.css`. `data-at="n"` shows an element at step n, `data-done="n"` ticks a plan item; `data-ms`/`data-hold` on a `.scene` set its pace. Math uses `data-tex` (KaTeX) with a plain-text fallback |
 | Policy wording | The page, **and** its "Effective"/"Updated" date near the top |
 | Social preview image | `assets/og-image.png` (1200×630) |
-| New page | Copy an existing page's `<head>`, header and footer; add it to `sitemap.xml` |
+| New page | Copy an existing page's `<head>`, header and footer; add it to `sitemap.xml` and `llms.txt` when authoritative |
+| Product identity or canonical facts | Update the homepage, `llms.txt`, relevant guide, and Store listing together |
+| Release version | Update `changelog.html`; use a real release date and only verified shipped features |
+| Crawler policy | Edit `robots.txt`; AI search and training crawlers are currently intentionally allowed |
 
 ### Design notes
 - Honors the visitor's **light/dark** preference and **reduced motion** setting.

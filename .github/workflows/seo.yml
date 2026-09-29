@@ -1,0 +1,30 @@
+name: SEO and discovery
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Validate metadata, links and crawler files
+        run: node scripts/check-seo.mjs
+      - name: Notify IndexNow about changed public URLs
+        if: github.event_name == 'push'
+        continue-on-error: true
+        env:
+          INDEXNOW_BEFORE: ${{ github.event.before }}
+          INDEXNOW_AFTER: ${{ github.sha }}
+        run: node scripts/indexnow.mjs
