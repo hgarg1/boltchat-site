@@ -216,6 +216,118 @@ document.querySelectorAll('.app[data-demo]').forEach(app => {
   }, { threshold: 0.25 }).observe(app);
 });
 
+// Contact form: checks fields as you go, sends to Formspree in place (the form also works as a
+// plain POST without JavaScript), shows Formspree's own field errors, and falls back to the normal
+// submit if Formspree asks for a CAPTCHA, which only its hosted page can show.
+const contactForm = document.getElementById('contact-form');
+if (contactForm) {
+  const $ = id => document.getElementById(id);
+  const fields = { name: $('cf-name'), email: $('cf-email'), message: $('cf-message') };
+  const status = $('cf-status');
+  const submit = $('cf-submit');
+  const done = $('contact-done');
+  const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+  const problem = name => {
+    const value = fields[name].value.trim();
+    if (name === 'name') return value ? '' : 'Please tell us your name.';
+    if (name === 'email') return !value ? 'We need an email to reply to.' : EMAIL.test(value) ? '' : 'That email address doesn’t look right.';
+    if (!value) return 'Please write a message.';
+    return value.length < 10 ? 'A little more detail, please (at least 10 characters).' : '';
+  };
+  const showError = (name, message) => {
+    const input = fields[name];
+    const slot = $(`cf-${name}-error`);
+    if (!input || !slot) return;
+    slot.textContent = message;
+    input.toggleAttribute('aria-invalid', !!message);
+    if (message) input.setAttribute('aria-describedby', slot.id);
+    else input.removeAttribute('aria-describedby');
+  };
+  // Only complain about a field once you've left it (or tried to send)
+  for (const [name, input] of Object.entries(fields)) {
+    input.addEventListener('blur', () => input.value && showError(name, problem(name)));
+    input.addEventListener('input', () => input.hasAttribute('aria-invalid') && showError(name, problem(name)));
+  }
+
+  const count = $('cf-count');
+  const updateCount = () => {
+    const n = fields.message.value.length;
+    count.textContent = `${n} / 5000`;
+    count.classList.toggle('near', n > 4500);
+  };
+  fields.message.addEventListener('input', updateCount);
+
+  // The subject line and the version field follow the chosen topic
+  const versionField = $('cf-version-field');
+  const onTopic = () => {
+    const topic = contactForm.querySelector('input[name="topic"]:checked')?.value || 'Question';
+    $('cf-subject').value = `Boltchat contact: ${topic}`;
+    versionField.hidden = topic !== 'Bug report';
+    $('cf-version').disabled = versionField.hidden; // disabled fields aren't sent
+  };
+  contactForm.addEventListener('change', e => e.target.name === 'topic' && onTopic());
+  onTopic();
+
+  const setBusy = busy => {
+    submit.disabled = busy;
+    submit.classList.toggle('busy', busy);
+    submit.querySelector('.btn-label').textContent = busy ? 'Sending…' : 'Send message';
+  };
+
+  contactForm.addEventListener('submit', async e => {
+    e.preventDefault();
+    status.textContent = '';
+    status.className = 'form-status';
+    const bad = Object.keys(fields).map(name => [name, problem(name)]).filter(([, m]) => m);
+    Object.keys(fields).forEach(name => showError(name, ''));
+    bad.forEach(([name, m]) => showError(name, m));
+    if (bad.length) {
+      fields[bad[0][0]].focus();
+      return;
+    }
+    setBusy(true);
+    try {
+      const res = await fetch(contactForm.action, { method: 'POST', body: new FormData(contactForm), headers: { Accept: 'application/json' } });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok) {
+        $('cf-done-name').textContent = fields.name.value.trim().split(/\s+/)[0];
+        $('cf-done-email').textContent = fields.email.value.trim();
+        contactForm.hidden = true;
+        done.hidden = false;
+        done.focus();
+        return;
+      }
+      const errors = Array.isArray(data.errors) ? data.errors : [];
+      if (errors.some(err => /captcha/i.test(`${err.code} ${err.message}`))) {
+        contactForm.submit(); // Formspree's hosted page handles the CAPTCHA
+        return;
+      }
+      let general = '';
+      for (const err of errors) {
+        if (err.field && fields[err.field]) showError(err.field, err.message);
+        else general = err.message;
+      }
+      status.textContent = general || (errors.length ? 'Please fix the highlighted fields.' : `Couldn’t send (error ${res.status}). Please try again in a moment.`);
+      status.classList.add('error');
+    } catch {
+      status.innerHTML = 'Couldn’t reach the server — check your connection, or email <a href="mailto:harshit.garg@harshit-garg.com">harshit.garg@harshit-garg.com</a>.';
+      status.classList.add('error');
+    } finally {
+      setBusy(false);
+    }
+  });
+
+  $('cf-again').addEventListener('click', () => {
+    contactForm.reset();
+    updateCount();
+    onTopic();
+    done.hidden = true;
+    contactForm.hidden = false;
+    fields.message.focus();
+  });
+}
+
 // Legal pages: highlight the section you're reading in the table of contents
 const tocLinks = [...document.querySelectorAll('.toc a')];
 if (tocLinks.length) {

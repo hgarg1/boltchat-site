@@ -45,6 +45,7 @@ A dependency-free static site — no build step, no framework, no tracking.
 ├── privacy.html        Privacy policy  ─┐
 ├── terms.html          Terms of use     ├─ linked from the Microsoft Store listing and the app
 ├── legal.html          Legal & licenses ─┘
+├── contact.html        Contact form (Formspree form xrpbrkkp; see the contact block in site.js)
 ├── 404.html            Not-found page
 ├── style.css           All styles (dark + light themes, reduced-motion aware)
 ├── app-demo.css        The live app demos: Boltchat recreated in HTML/CSS, sharp at any size
