@@ -16,6 +16,24 @@ function onScroll() {
 addEventListener('scroll', onScroll, { passive: true });
 onScroll();
 
+const mobileNav = () => matchMedia('(max-width: 860px)').matches;
+
+if (nav && !nav.querySelector('.nav-kicker')) {
+  const kicker = document.createElement('p');
+  kicker.className = 'nav-kicker';
+  kicker.textContent = 'Navigate';
+  const after = nav.querySelector('.nav-indicator');
+  nav.insertBefore(kicker, after ? after.nextSibling : nav.firstChild);
+}
+const headerCta = document.querySelector('.nav-cta');
+if (nav && headerCta && !nav.querySelector('.nav-sheet-cta')) {
+  const sheetCta = headerCta.cloneNode(true);
+  sheetCta.className = 'nav-sheet-cta';
+  sheetCta.removeAttribute('title');
+  nav.appendChild(sheetCta);
+}
+nav?.querySelectorAll('a').forEach((a, i) => a.style.setProperty('--i', i));
+
 // A soft pill glides to the hovered link and settles back on the current page
 if (nav && indicator) {
   const current = nav.querySelector('[aria-current="page"]');
@@ -28,24 +46,40 @@ if (nav && indicator) {
     indicator.style.transform = `translateX(${link.offsetLeft}px)`;
     indicator.style.opacity = '1';
   };
-  nav.querySelectorAll('a').forEach(a => a.addEventListener('pointerenter', () => moveTo(a)));
+  nav.querySelectorAll('a:not(.nav-sheet-cta)').forEach(a => a.addEventListener('pointerenter', () => moveTo(a)));
   nav.addEventListener('pointerleave', () => moveTo(current));
   // wait for fonts so the first measurement is right
   (document.fonts?.ready || Promise.resolve()).then(() => moveTo(current));
   addEventListener('resize', () => moveTo(current));
 }
 
-// Mobile: hamburger opens a drop-down sheet
-function setMenu(open) {
+// Mobile: hamburger opens a glass sheet
+function setMenu(open, { restoreFocus = false } = {}) {
+  if (!header || !toggle) return;
   header.classList.toggle('open', open);
+  document.body.classList.toggle('nav-open', open);
   toggle.setAttribute('aria-expanded', String(open));
   toggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+  const lock = open && mobileNav();
+  document.querySelectorAll('main, .site-footer').forEach(el => el.toggleAttribute('inert', lock));
+  if (nav) {
+    if (mobileNav()) nav.toggleAttribute('inert', !open);
+    else nav.removeAttribute('inert');
+  }
+  if (restoreFocus) toggle.focus();
 }
+if (mobileNav()) nav?.setAttribute('inert', '');
 if (toggle) {
   toggle.addEventListener('click', () => setMenu(!header.classList.contains('open')));
-  nav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => setMenu(false)));
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') setMenu(false); });
+  nav?.addEventListener('click', e => { if (e.target.closest('a')) setMenu(false); });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && header.classList.contains('open')) setMenu(false, { restoreFocus: true });
+  });
   document.addEventListener('click', e => { if (!header.contains(e.target)) setMenu(false); });
+  addEventListener('resize', () => {
+    if (!mobileNav()) setMenu(false);
+    else if (!header.classList.contains('open')) nav?.setAttribute('inert', '');
+  });
 }
 
 // Reveal elements as they scroll into view
