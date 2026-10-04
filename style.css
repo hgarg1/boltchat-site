@@ -1411,3 +1411,8 @@ code { font: 0.9em "Cascadia Code", Consolas, monospace; padding: 1px 6px; borde
     grid-template-columns: 1fr;
   }
 }
+
+/* Android beta page: the two tester steps shown after signing up */
+.done-steps { text-align: left; max-width: 520px; margin: 18px auto; padding-left: 22px; display: grid; gap: 16px; }
+.done-steps li { color: var(--muted); }
+.done-steps .btn { display: inline-block; margin: 8px 0 4px; }

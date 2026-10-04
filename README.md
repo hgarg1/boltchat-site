@@ -45,7 +45,7 @@ A dependency-free static site — no build step, no framework, no tracking.
 ├── getting-started.html Installation, first-run and troubleshooting guide
 ├── code-workspace.html  Detailed Code workspace product guide
 ├── private-ai-chat.html Plain-language privacy and data-flow overview
-├── android.html         Android open-beta page: features and a signup form (same Formspree form xrpbrkkp) that reveals the Play tester link
+├── android.html         Android beta page: features and a signup form (same Formspree form xrpbrkkp) that reveals the tester Google Group and the Play opt-in link
 ├── changelog.html       Current release notes
 ├── leadership.html     Leadership team
 ├── privacy.html        Privacy policy  ─┐

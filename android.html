@@ -4,14 +4,14 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Boltchat for Android — Join the Beta</title>
-  <meta name="description" content="Boltchat for Android is in open beta: fast Groq chat, web search, Python, math, voice and Projects on your phone. Leave your email to get the tester link.">
+  <meta name="description" content="Boltchat for Android is in beta: fast Groq chat, web search, Python, math, voice and Projects on your phone. Leave your email to get the tester links.">
   <meta name="robots" content="index, follow, max-image-preview:large">
   <link rel="canonical" href="https://boltchat.harshit-garg.com/android.html">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Boltchat">
   <meta property="og:locale" content="en_US">
   <meta property="og:title" content="Boltchat for Android — Join the Beta">
-  <meta property="og:description" content="Fast Groq chat with web search, Python, math, voice and Projects on Android. Leave your email to get the open-beta tester link.">
+  <meta property="og:description" content="Fast Groq chat with web search, Python, math, voice and Projects on Android. Leave your email to get the beta tester links.">
   <meta property="og:url" content="https://boltchat.harshit-garg.com/android.html">
   <meta property="og:image" content="https://boltchat.harshit-garg.com/assets/og-image.png">
   <meta property="og:image:width" content="1200">
@@ -19,7 +19,7 @@
   <meta property="og:image:alt" content="Boltchat, a fast and private AI chat app for Windows and Android">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Boltchat for Android — Join the Beta">
-  <meta name="twitter:description" content="Join the Boltchat Android open beta: streaming Groq chat, tools and Projects on your phone.">
+  <meta name="twitter:description" content="Join the Boltchat Android beta: streaming Groq chat, tools and Projects on your phone.">
   <meta name="twitter:image" content="https://boltchat.harshit-garg.com/assets/og-image.png">
   <meta name="twitter:image:alt" content="Boltchat, a fast and private AI chat app for Windows and Android">
   <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#07070a">
@@ -34,7 +34,7 @@
     "@id": "https://boltchat.harshit-garg.com/android.html#software",
     "name": "Boltchat for Android",
     "url": "https://boltchat.harshit-garg.com/android.html",
-    "description": "A fast, private Android chat app for models available through Groq, with web search, Python code execution, voice input, typeset math, optional memory and Projects. Open beta.",
+    "description": "A fast, private Android chat app for models available through Groq, with web search, Python code execution, voice input, typeset math, optional memory and Projects. Beta.",
     "image": "https://boltchat.harshit-garg.com/assets/og-image.png",
     "operatingSystem": "Android 8.0 or later",
     "applicationCategory": "ProductivityApplication",
@@ -78,9 +78,9 @@
 
   <section class="doc-hero">
     <div class="wrap">
-      <span class="pill reveal">Open beta</span>
+      <span class="pill reveal">Beta</span>
       <h1 class="reveal" style="--d: .05s">Boltchat for Android</h1>
-      <p class="updated reveal" style="--d: .1s">The same fast, private Groq chat, rebuilt natively for your phone. Leave your email and the tester link appears right here.</p>
+      <p class="updated reveal" style="--d: .1s">The same fast, private Groq chat, rebuilt natively for your phone. Leave your email and the two tester links appear right here.</p>
     </div>
   </section>
 
@@ -109,7 +109,7 @@
 
           <!-- Same Formspree form as the contact page; these fields tell the two apart in the inbox -->
           <input type="hidden" name="topic" value="Android beta">
-          <input type="hidden" name="message" value="Android beta signup: please send the tester link.">
+          <input type="hidden" name="message" value="Android beta signup: please add me to the testers group.">
           <input type="hidden" name="_subject" value="Boltchat Android beta signup">
 
           <!-- Spam trap: people never see or fill this -->
@@ -119,7 +119,7 @@
           </div>
 
           <div class="form-actions">
-            <button class="btn primary" type="submit" id="bf-submit"><span class="btn-label">Get the tester link</span><span class="spinner" aria-hidden="true"></span></button>
+            <button class="btn primary" type="submit" id="bf-submit"><span class="btn-label">Get the tester links</span><span class="spinner" aria-hidden="true"></span></button>
             <p class="form-note">Sent securely with <a href="https://formspree.io" rel="noopener">Formspree</a>. We only use your email to reach you about the beta. See <a href="privacy.html#contact-form">how we handle it</a>.</p>
           </div>
           <p class="form-status" id="bf-status" role="status" aria-live="polite"></p>
@@ -128,8 +128,11 @@
         <div class="contact-done" id="beta-done" hidden tabindex="-1">
           <svg class="done-check" viewBox="0 0 52 52" aria-hidden="true"><circle cx="26" cy="26" r="24"/><path d="M15 27l7.5 7.5L38 19"/></svg>
           <h2>You're in, <span id="bf-done-name">friend</span></h2>
-          <p>Open the tester link on your Android phone, tap <strong>Become a tester</strong>, then install Boltchat from Google Play. You'll need to be signed in to Google Play with a Google account.</p>
-          <p><a class="btn primary" id="beta-link" href="https://play.google.com/apps/testing/com.harshitgarg.boltchat" rel="noopener">Open the tester link</a></p>
+          <p>Two quick steps, both with the Google account you use on Google Play:</p>
+          <ol class="done-steps">
+            <li><strong>Join the testers group.</strong> <a class="btn primary" id="beta-group" href="https://groups.google.com/g/boltchat-android-testers" rel="noopener">Join the group</a> Pick the Google account you use on your phone and request to join; it takes effect when Google adds you.</li>
+            <li><strong>Become a tester.</strong> <a class="btn primary" id="beta-link" href="https://play.google.com/apps/testing/com.harshitgarg.boltchat" rel="noopener">Open the tester link</a> on your Android phone, tap <strong>Become a tester</strong>, then install Boltchat from Google Play.</li>
+          </ol>
           <p class="fine">We also have <strong id="bf-done-email">your email</strong> so we can tell you about updates. Bring your own Groq key: <a href="https://console.groq.com/keys" rel="noopener">get a free one</a>.</p>
         </div>
       </div>

@@ -365,8 +365,9 @@ if (contactForm) {
   });
 }
 
-// Android beta signup: the same Formspree form as the contact page. On success it reveals the Google
-// Play tester link, which sits in the page's own markup (#beta-link) so there is one place to change it.
+// Android beta signup: the same Formspree form as the contact page. On success it reveals the two
+// tester steps (Google Group + Play opt-in link), which sit in the page's own markup (#beta-group and
+// #beta-link) so there is one place to change them.
 // The form also works as a plain POST without JavaScript (Formspree's own thank-you page then shows).
 const betaForm = document.querySelector('form#beta-form');
 if (betaForm) {
