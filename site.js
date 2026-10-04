@@ -197,6 +197,7 @@ document.querySelectorAll('.app[data-demo]').forEach(app => {
   const canvas = app.querySelector('.app-canvas');
   const scenes = [...app.querySelectorAll('.scene')];
   const lastStep = scene => Math.max(0, ...[...scene.querySelectorAll('[data-at], [data-done]')].map(n => Number(n.dataset.at || n.dataset.done)));
+  const pointList = app.closest('.phone-layout')?.querySelector('.phone-points');
   let index = 0;
   let step = 0;
   let timer = 0;
@@ -206,11 +207,13 @@ document.querySelectorAll('.app[data-demo]').forEach(app => {
     const scene = scenes[index];
     scene.querySelectorAll('[data-at]').forEach(n => n.classList.toggle('on', Number(n.dataset.at) <= step));
     scene.querySelectorAll('[data-done]').forEach(n => n.classList.toggle('done', Number(n.dataset.done) <= step));
+    scene.querySelectorAll('[data-off]').forEach(n => n.classList.toggle('off', Number(n.dataset.off) <= step));
   };
   const show = i => {
     index = i;
     step = reduceMotion ? Infinity : 0;
     canvas.dataset.mode = scenes[i].dataset.scene;
+    pointList?.querySelectorAll('li').forEach(li => li.classList.toggle('on', li.dataset.go === canvas.dataset.mode));
     scenes.forEach((s, j) => s.classList.toggle('is-active', j === i));
     paint();
   };
@@ -236,7 +239,8 @@ document.querySelectorAll('.app[data-demo]').forEach(app => {
 
   app.classList.add('js');
   show(0);
-  app.querySelectorAll('[data-go]').forEach(button => button.addEventListener('click', () => {
+  const goers = [...app.querySelectorAll('[data-go]'), ...(pointList ? pointList.querySelectorAll('li[data-go]') : [])];
+  goers.forEach(button => button.addEventListener('click', () => {
     const i = scenes.findIndex(s => s.dataset.scene === button.dataset.go);
     if (i === -1) return;
     stop();

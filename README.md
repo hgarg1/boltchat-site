@@ -55,6 +55,7 @@ A dependency-free static site — no build step, no framework, no tracking.
 ├── 404.html            Not-found page
 ├── style.css           All styles (dark + light themes, reduced-motion aware)
 ├── app-demo.css        The live app demos: Boltchat recreated in HTML/CSS, sharp at any size
+├── phone-demo.css       The Android demo on android.html: the app in a phone frame, played by the same step player
 ├── site.js             Progressive enhancements: navbar, scroll reveal, demos, TOC
 ├── assets/             Icon, social image, leadership photo
 ├── scripts/             SEO validation and IndexNow notification
