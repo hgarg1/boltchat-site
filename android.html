@@ -86,19 +86,79 @@
     </div>
   </section>
 
-  <main id="main" class="section contact">
+  <main id="main" class="section contact beta-page">
     <section class="wrap phone-section">
       <div class="phone-layout">
-        <div class="phone-copy reveal">
-          <div class="eyebrow">Built natively for Android</div>
-          <h2>Fast enough to feel alive, in your pocket</h2>
-          <p class="sub">Tap a feature to see it run. This is Boltchat on Android, recreated live in your browser.</p>
-          <ul class="phone-points" id="phone-points">
-            <li data-go="chat" class="on"><span class="ico">⚡</span><span><b>Streams after you leave.</b> Switch apps and the reply keeps arriving; a notification tells you when it lands.</span></li>
-            <li data-go="web"><span class="ico">🌐</span><span><b>Search and Python.</b> <code>/web</code> and <code>/code</code> show their steps, not a black box.</span></li>
-            <li data-go="projects"><span class="ico">🗂</span><span><b>Projects.</b> Add files; search runs on your phone and replies cite the passages.</span></li>
-            <li data-go="voice"><span class="ico">🎙</span><span><b>Voice, then a draft.</b> Talk, fix a word, then send.</span></li>
-          </ul>
+        <div class="beta-card reveal" style="--d: .08s">
+          <div class="beta-head">
+            <span class="eyebrow">Join the beta</span>
+            <h2>Get the tester links</h2>
+            <p>Leave your name and email. The two links you need appear right here, and we'll let you know about updates.</p>
+          </div>
+          <div class="contact-card beta-form-card">
+        <!-- Works without JavaScript as a normal form post; site.js upgrades it to send in place -->
+        <form class="contact-form" id="beta-form" action="https://formspree.io/f/xrpbrkkp" method="POST" novalidate>
+          <div class="field-row">
+            <div class="field">
+              <label for="bf-name">Name</label>
+              <input id="bf-name" name="name" type="text" autocomplete="name" maxlength="100" required placeholder="Ada Lovelace">
+              <span class="field-error" id="bf-name-error"></span>
+            </div>
+            <div class="field">
+              <label for="bf-email">Email</label>
+              <input id="bf-email" name="email" type="email" autocomplete="email" maxlength="200" required placeholder="you@example.com">
+              <span class="field-error" id="bf-email-error"></span>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="bf-device">Phone <span class="optional">optional</span></label>
+            <input id="bf-device" name="device" type="text" maxlength="100" placeholder="e.g. Pixel 8, Android 15">
+          </div>
+
+          <!-- Same Formspree form as the contact page; these fields tell the two apart in the inbox -->
+          <input type="hidden" name="topic" value="Android beta">
+          <input type="hidden" name="message" value="Android beta signup: please add me to the testers group.">
+          <input type="hidden" name="_subject" value="Boltchat Android beta signup">
+
+          <!-- Spam trap: people never see or fill this -->
+          <div class="gotcha" aria-hidden="true">
+            <label for="bf-gotcha">Leave this empty</label>
+            <input id="bf-gotcha" name="_gotcha" type="text" tabindex="-1" autocomplete="off">
+          </div>
+
+          <div class="form-actions">
+            <button class="btn primary" type="submit" id="bf-submit"><span class="btn-label">Get the tester links</span><span class="spinner" aria-hidden="true"></span></button>
+            <p class="form-note">Sent securely with <a href="https://formspree.io" rel="noopener">Formspree</a>. We only use your email to reach you about the beta. See <a href="privacy.html#contact-form">how we handle it</a>.</p>
+          </div>
+          <p class="form-status" id="bf-status" role="status" aria-live="polite"></p>
+        </form>
+
+        <div class="contact-done" id="beta-done" hidden tabindex="-1">
+          <svg class="done-check" viewBox="0 0 52 52" aria-hidden="true"><circle cx="26" cy="26" r="24"/><path d="M15 27l7.5 7.5L38 19"/></svg>
+          <h2>You're in, <span id="bf-done-name">friend</span></h2>
+          <p class="done-lead">Two quick steps, both with the Google account you use on Google Play.</p>
+          <div class="done-steps">
+            <section class="done-step">
+              <span class="done-num">1</span>
+              <div>
+                <h3>Join the testers group</h3>
+                <p>Request to join with the Google account on your phone. Access starts once Google adds you.</p>
+                <a class="btn primary" id="beta-group" href="https://groups.google.com/g/boltchat-android-testers" rel="noopener">Join the group</a>
+              </div>
+            </section>
+            <section class="done-step">
+              <span class="done-num">2</span>
+              <div>
+                <h3>Become a tester</h3>
+                <p>On your Android phone, open the tester link, tap <strong>Become a tester</strong>, then install Boltchat from Google Play.</p>
+                <a class="btn primary" id="beta-link" href="https://play.google.com/apps/testing/com.harshitgarg.boltchat" rel="noopener">Open the tester link</a>
+              </div>
+            </section>
+          </div>
+          <p class="fine">We also have <strong id="bf-done-email">your email</strong>. Bring your own Groq key: <a href="https://console.groq.com/keys" rel="noopener">get a free one</a>.</p>
+        </div>
+          </div>
         </div>
 
         <div class="phone-stage reveal" style="--d: .1s">
@@ -165,80 +225,33 @@
               </div>
             </div>
           </div>
-        </div>
+            <ul class="phone-points" id="phone-points" aria-label="Try a feature">
+              <li data-go="chat" class="on">⚡ Streams in the background</li>
+              <li data-go="web">🌐 Search &amp; Python</li>
+              <li data-go="projects">🗂 Projects</li>
+              <li data-go="voice">🎙 Voice</li>
+            </ul>
+          </div>
       </div>
     </section>
 
-    <div class="wrap contact-grid">
-      <div class="contact-card reveal" style="--d: .12s">
-        <!-- Works without JavaScript as a normal form post; site.js upgrades it to send in place -->
-        <form class="contact-form" id="beta-form" action="https://formspree.io/f/xrpbrkkp" method="POST" novalidate>
-          <div class="field-row">
-            <div class="field">
-              <label for="bf-name">Name</label>
-              <input id="bf-name" name="name" type="text" autocomplete="name" maxlength="100" required placeholder="Ada Lovelace">
-              <span class="field-error" id="bf-name-error"></span>
-            </div>
-            <div class="field">
-              <label for="bf-email">Email</label>
-              <input id="bf-email" name="email" type="email" autocomplete="email" maxlength="200" required placeholder="you@example.com">
-              <span class="field-error" id="bf-email-error"></span>
-            </div>
-          </div>
-
-          <div class="field">
-            <label for="bf-device">Phone <span class="optional">optional</span></label>
-            <input id="bf-device" name="device" type="text" maxlength="100" placeholder="e.g. Pixel 8, Android 15">
-          </div>
-
-          <!-- Same Formspree form as the contact page; these fields tell the two apart in the inbox -->
-          <input type="hidden" name="topic" value="Android beta">
-          <input type="hidden" name="message" value="Android beta signup: please add me to the testers group.">
-          <input type="hidden" name="_subject" value="Boltchat Android beta signup">
-
-          <!-- Spam trap: people never see or fill this -->
-          <div class="gotcha" aria-hidden="true">
-            <label for="bf-gotcha">Leave this empty</label>
-            <input id="bf-gotcha" name="_gotcha" type="text" tabindex="-1" autocomplete="off">
-          </div>
-
-          <div class="form-actions">
-            <button class="btn primary" type="submit" id="bf-submit"><span class="btn-label">Get the tester links</span><span class="spinner" aria-hidden="true"></span></button>
-            <p class="form-note">Sent securely with <a href="https://formspree.io" rel="noopener">Formspree</a>. We only use your email to reach you about the beta. See <a href="privacy.html#contact-form">how we handle it</a>.</p>
-          </div>
-          <p class="form-status" id="bf-status" role="status" aria-live="polite"></p>
-        </form>
-
-        <div class="contact-done" id="beta-done" hidden tabindex="-1">
-          <svg class="done-check" viewBox="0 0 52 52" aria-hidden="true"><circle cx="26" cy="26" r="24"/><path d="M15 27l7.5 7.5L38 19"/></svg>
-          <h2>You're in, <span id="bf-done-name">friend</span></h2>
-          <p>Two quick steps, both with the Google account you use on Google Play:</p>
-          <ol class="done-steps">
-            <li><strong>Join the testers group.</strong> <a class="btn primary" id="beta-group" href="https://groups.google.com/g/boltchat-android-testers" rel="noopener">Join the group</a> Pick the Google account you use on your phone and request to join; it takes effect when Google adds you.</li>
-            <li><strong>Become a tester.</strong> <a class="btn primary" id="beta-link" href="https://play.google.com/apps/testing/com.harshitgarg.boltchat" rel="noopener">Open the tester link</a> on your Android phone, tap <strong>Become a tester</strong>, then install Boltchat from Google Play.</li>
-          </ol>
-          <p class="fine">We also have <strong id="bf-done-email">your email</strong> so we can tell you about updates. Bring your own Groq key: <a href="https://console.groq.com/keys" rel="noopener">get a free one</a>.</p>
-        </div>
+    <section class="wrap beta-info">
+      <div class="aside-card reveal">
+        <h3>📱 What you need</h3>
+        <p>Android 8.0 or later, a Google account for Google Play, and your own <a href="https://console.groq.com/keys" rel="noopener">Groq API key</a> (a free tier is available). Your key is stored encrypted in the Android Keystore.</p>
       </div>
-
-      <aside class="contact-aside reveal" style="--d: .2s">
-        <div class="aside-card">
-          <h3>📱 What you need</h3>
-          <p>Android 8.0 or later, a Google account for Google Play, and your own <a href="https://console.groq.com/keys" rel="noopener">Groq API key</a> (a free tier is available). Your key is stored encrypted in the Android Keystore.</p>
-        </div>
-        <div class="aside-card">
-          <h3>🧪 It's a beta</h3>
-          <p>It works and it's the same engine as the Windows app, but expect rough edges. Use <strong>Report</strong> under a reply, or <a href="contact.html">write to us</a>, if something's off.</p>
-        </div>
-        <div class="aside-card">
-          <h3>🔒 Same promise</h3>
-          <p>No account, no ads, no tracking. Chats stay on your phone; requests go straight to Groq with your key.</p>
-        </div>
-      </aside>
-    </div>
+      <div class="aside-card reveal" style="--d: .06s">
+        <h3>🧪 It's a beta</h3>
+        <p>It's the same engine as the Windows app, but expect rough edges. Use <strong>Report</strong> under a reply, or <a href="contact.html">write to us</a>, if something's off.</p>
+      </div>
+      <div class="aside-card reveal" style="--d: .12s">
+        <h3>🔒 Same promise</h3>
+        <p>No account, no ads, no tracking. Chats stay on your phone; requests go straight to Groq with your key.</p>
+      </div>
+    </section>
 
     <div class="wrap">
-      <div class="center reveal" style="margin-top: 72px">
+      <div class="center reveal">
         <div class="eyebrow">What's in the beta</div>
         <h2>Everything from the PC, made for a phone</h2>
       </div>
