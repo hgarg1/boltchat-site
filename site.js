@@ -365,6 +365,82 @@ if (contactForm) {
   });
 }
 
+// Android beta signup: the same Formspree form as the contact page. On success it reveals the Google
+// Play tester link, which sits in the page's own markup (#beta-link) so there is one place to change it.
+// The form also works as a plain POST without JavaScript (Formspree's own thank-you page then shows).
+const betaForm = document.querySelector('form#beta-form');
+if (betaForm) {
+  const $ = id => document.getElementById(id);
+  const fields = { name: $('bf-name'), email: $('bf-email') };
+  const status = $('bf-status');
+  const submit = $('bf-submit');
+  const done = $('beta-done');
+  const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+  const problem = name => {
+    const value = fields[name].value.trim();
+    if (name === 'name') return value ? '' : 'Please tell us your name.';
+    return !value ? 'We need an email to reach you.' : EMAIL.test(value) ? '' : 'That email address doesn’t look right.';
+  };
+  const showError = (name, message) => {
+    const slot = $(`bf-${name}-error`);
+    slot.textContent = message;
+    fields[name].toggleAttribute('aria-invalid', !!message);
+    if (message) fields[name].setAttribute('aria-describedby', slot.id);
+    else fields[name].removeAttribute('aria-describedby');
+  };
+  for (const [name, input] of Object.entries(fields)) {
+    input.addEventListener('blur', () => input.value && showError(name, problem(name)));
+    input.addEventListener('input', () => input.hasAttribute('aria-invalid') && showError(name, problem(name)));
+  }
+  const setBusy = busy => {
+    submit.disabled = busy;
+    submit.classList.toggle('busy', busy);
+    submit.querySelector('.btn-label').textContent = busy ? 'Sending…' : 'Get the tester link';
+  };
+  betaForm.addEventListener('submit', async e => {
+    e.preventDefault();
+    status.textContent = '';
+    status.className = 'form-status';
+    const bad = Object.keys(fields).map(name => [name, problem(name)]).filter(([, m]) => m);
+    Object.keys(fields).forEach(name => showError(name, ''));
+    bad.forEach(([name, m]) => showError(name, m));
+    if (bad.length) {
+      fields[bad[0][0]].focus();
+      return;
+    }
+    setBusy(true);
+    try {
+      const res = await fetch(betaForm.action, { method: 'POST', body: new FormData(betaForm), headers: { Accept: 'application/json' } });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok) {
+        $('bf-done-name').textContent = fields.name.value.trim().split(/\s+/)[0];
+        $('bf-done-email').textContent = fields.email.value.trim();
+        betaForm.hidden = true;
+        done.hidden = false;
+        done.focus();
+        return;
+      }
+      const errors = Array.isArray(data.errors) ? data.errors : [];
+      if (errors.some(err => /captcha/i.test(`${err.code} ${err.message}`))) {
+        betaForm.submit(); // Formspree's hosted page handles the CAPTCHA
+        return;
+      }
+      let general = '';
+      for (const err of errors) {
+        if (err.field && fields[err.field]) showError(err.field, err.message);
+        else general = err.message;
+      }
+      status.textContent = general || (errors.length ? 'Please fix the highlighted fields.' : `Couldn’t send (error ${res.status}). Please try again in a moment.`);
+      status.classList.add('error');
+    } catch {
+      status.innerHTML = 'Couldn’t reach the server — check your connection, or email <a href="mailto:harshit.garg@harshit-garg.com">harshit.garg@harshit-garg.com</a>.';
+      status.classList.add('error');
+    } finally {
+      setBusy(false);
+    }
+  });
+}
+
 // Legal pages: highlight the section you're reading in the table of contents
 const tocLinks = [...document.querySelectorAll('.toc a')];
 if (tocLinks.length) {

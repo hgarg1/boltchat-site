@@ -5,7 +5,7 @@
 # Boltchat — website
 
 **AI chat at the speed of thought.**
-The marketing, leadership and legal site for Boltchat, a fast Windows chat app for the open models on Groq.
+The marketing, leadership and legal site for Boltchat, a fast chat app for Windows (and Android, in beta) for the open models on Groq.
 
 [**boltchat.harshit-garg.com**](https://boltchat.harshit-garg.com) · [Privacy](https://boltchat.harshit-garg.com/privacy.html) · [Terms](https://boltchat.harshit-garg.com/terms.html) · [Legal](https://boltchat.harshit-garg.com/legal.html) · [Leadership](https://boltchat.harshit-garg.com/leadership.html)
 
@@ -26,6 +26,7 @@ Boltchat is a Windows desktop app that streams answers from the open models on [
 | 🐍 **Code runner** | `/code` — real Python for exact answers, with code and output shown |
 | ∑ **Beautiful math** | LaTeX, matrices and chemistry typeset with KaTeX |
 | 🎙 **Voice input** | Whisper transcription in well under a second |
+| 🗂 **Projects** | Grouped chats with shared instructions, searchable files (PDF, Office, EPUB, code) and earlier-chat recall |
 | ✦ **Memory** | Optional: remembers facts about you across chats — add, review and delete them in Settings |
 | ⌨ **Code workspace** | Monaco (VS Code) editor for trusted folders, with a LangGraph coding agent that plans, reads and edits files as diffs you review, runs your tests behind a GPT-OSS 20B safety gate, and supports undo, resumable runs and inline Ctrl+K edits |
 | ▶ **Terminal & browser** | A real shell under the editor, and a built-in browser the agent drives to QA web pages (clicks, typing, console, vision checks) |
@@ -44,6 +45,7 @@ A dependency-free static site — no build step, no framework, no tracking.
 ├── getting-started.html Installation, first-run and troubleshooting guide
 ├── code-workspace.html  Detailed Code workspace product guide
 ├── private-ai-chat.html Plain-language privacy and data-flow overview
+├── android.html         Android open-beta page: features and a signup form (same Formspree form xrpbrkkp) that reveals the Play tester link
 ├── changelog.html       Current release notes
 ├── leadership.html     Leadership team
 ├── privacy.html        Privacy policy  ─┐
