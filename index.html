@@ -4,14 +4,14 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Boltchat — Fast, Private AI Chat for Windows and Android</title>
-  <meta name="description" content="Boltchat is a fast, private AI chat app for models on Groq: web search, code, voice, vision, memory, Projects and a coding workspace. Windows, Android beta.">
+  <meta name="description" content="Boltchat is a fast, private AI chat app for models on Groq: web search, code, voice chat, adjustable thinking, vision, memory, Projects and a coding workspace. Windows, Android beta.">
   <meta name="robots" content="index, follow, max-image-preview:large">
   <link rel="canonical" href="https://boltchat.harshit-garg.com/">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Boltchat">
   <meta property="og:locale" content="en_US">
   <meta property="og:title" content="Boltchat — Fast, Private AI Chat for Windows and Android">
-  <meta property="og:description" content="Fast, private AI chat for models on Groq on Windows and Android, with web search, code, voice, vision, memory, Projects and a coding workspace.">
+  <meta property="og:description" content="Fast, private AI chat for models on Groq on Windows and Android, with web search, code, voice chat, adjustable thinking, vision, memory, Projects and a coding workspace.">
   <meta property="og:url" content="https://boltchat.harshit-garg.com/">
   <meta property="og:image" content="https://boltchat.harshit-garg.com/assets/og-image.png">
   <meta property="og:image:width" content="1200">
@@ -50,7 +50,7 @@
         "name": "Boltchat",
         "url": "https://boltchat.harshit-garg.com/",
         "downloadUrl": "https://apps.microsoft.com/detail/9NXXLRNBMWG0",
-        "description": "A fast, private Windows AI chat app for models available through Groq, with web search, code execution, voice, vision, optional memory, Projects and a reviewable coding workspace. An Android beta is available.",
+        "description": "A fast, private Windows AI chat app for models available through Groq, with web search, code execution, voice chat, adjustable thinking, vision, optional memory, Projects and a reviewable coding workspace. An Android beta is available.",
         "image": "https://boltchat.harshit-garg.com/assets/og-image.png",
         "operatingSystem": "Windows 10, Windows 11",
         "applicationCategory": "UtilitiesApplication",
@@ -60,7 +60,9 @@
           "Streaming AI chat",
           "Web search with sources",
           "Python code execution",
-          "Voice input and image understanding",
+          "Voice chat and voice input",
+          "Adjustable reasoning level on reasoning models",
+          "Image understanding",
           "Optional local memory",
           "Projects with searchable files and shared instructions",
           "Background operation and notifications",
@@ -122,7 +124,7 @@
         <div class="badge reveal"><b>⚡ <span data-count="486">486</span> tok/s</b> measured on GPT-OSS 120B</div>
         <img class="hero-icon" src="assets/icon-128.png" alt="" width="104" height="104" fetchpriority="high">
         <h1 class="reveal" style="--d: .05s">AI chat at the <span class="shine">speed of thought</span></h1>
-        <p class="lede reveal" style="--d: .12s">Boltchat is a focused app for models available through Groq, on Windows and now in beta on Android. Answers stream in faster than you can read — with web search, a code runner, beautiful math, voice, Projects and an optional memory built in.</p>
+        <p class="lede reveal" style="--d: .12s">Boltchat is a focused app for models available through Groq, on Windows and now in beta on Android. Answers stream in faster than you can read — with web search, a code runner, beautiful math, voice chat, adjustable thinking, Projects and an optional memory built in.</p>
         <div class="cta reveal" style="--d: .2s">
           <a class="store-badge" href="https://apps.microsoft.com/detail/9NXXLRNBMWG0" rel="noopener"><picture><source srcset="https://get.microsoft.com/images/en-us%20light.svg" media="(prefers-color-scheme: light)"><img src="https://get.microsoft.com/images/en-us%20dark.svg" width="200" height="72" alt="Download from the Microsoft Store"></picture></a>
           <a class="btn" href="android.html">Android beta →</a>
@@ -236,19 +238,15 @@
           <div class="card reveal" style="--d: 0s"><div class="ico">⚡</div><h3>Ridiculously fast</h3><p>Groq's LPUs stream at 400+ tokens per second. Every reply shows its real speed.</p></div>
           <div class="card reveal" style="--d: .06s"><div class="ico">🌐</div><h3>Web search</h3><p>Type <code>/web</code> and the model searches, reads pages and cites its sources.</p></div>
           <div class="card reveal" style="--d: .12s"><div class="ico">🐍</div><h3>Code runner</h3><p><code>/code</code> runs real Python for exact answers — you see the code and the output.</p></div>
-          <div class="card reveal" style="--d: .18s"><div class="ico">∑</div><h3>Beautiful math</h3><p>LaTeX, matrices and chemistry typeset with KaTeX on glowing graph-paper cards.</p></div>
-          <div class="card reveal" style="--d: .24s"><div class="ico">🎙</div><h3>Voice input</h3><p>Speak instead of typing — Whisper transcribes you in well under a second.</p></div>
-          <div class="card reveal" style="--d: .3s"><div class="ico">✦</div><h3>Remembers you</h3><p>Turn on memory and answers get more personal over time. Say “remember that…”, and see or delete every memory in Settings.</p></div>
-          <div class="card reveal" style="--d: .36s"><div class="ico">📰</div><h3>Fresh ideas</h3><p>The new-chat screen suggests things to ask, drawn from your memories, the day's top stories from seven public-service newsrooms in five countries — ranked by how many independently cover them — and a few fun ideas.</p></div>
-          <div class="card reveal" style="--d: .42s"><div class="ico">⌨</div><h3>Code workspace</h3><p>Open a folder in the editor that powers VS Code, with search, tabs and syntax highlighting for 80+ languages.</p><a class="card-link" href="code-workspace.html">Explore the Code workspace →</a></div>
-          <div class="card reveal" style="--d: .48s"><div class="ico">✎</div><h3>A coding agent</h3><p>Describe a task; the agent plans it, reads your code, makes the changes and runs your tests to check them. A safety check guards every command, and every change can be undone.</p></div>
-          <div class="card reveal" style="--d: .54s"><div class="ico">▶</div><h3>Built-in terminal</h3><p>A real PowerShell or Command Prompt in your project folder, in tabs under the editor. The agent's own commands show up in their own tab.</p></div>
-          <div class="card reveal" style="--d: .6s"><div class="ico">🌐</div><h3>Browser QA</h3><p>A built-in browser the agent can drive: it opens your pages, clicks, types, reads console errors and asks a vision model whether things look right.</p></div>
-          <div class="card reveal" style="--d: .66s"><div class="ico">🗂</div><h3>Projects</h3><p>Group related chats and give them shared instructions that layer on your general ones. Add PDFs, Word, Excel, EPUB or code; search understands meaning and runs on your device, new chats can recall the project's earlier ones, and replies show what the project contributed.</p></div>
-          <div class="card reveal" style="--d: .72s"><div class="ico">🔔</div><h3>Finishes while you're away</h3><p>Keep Boltchat in the notification area, optionally start with Windows, and get a notification when a reply or coding-agent task is done or needs you.</p></div>
-          <div class="card reveal" style="--d: .78s"><div class="ico">📊</div><h3>Your Groq limits, exactly</h3><p>The sidebar shows requests left today and tokens left this minute straight from Groq's own headers, with when each resets.</p></div>
-          <div class="card reveal" style="--d: .84s"><div class="ico">📱</div><h3>On Android, too</h3><p>A native Android app with the same chat engine, tools and Projects, whose replies keep streaming after you leave the app. It's in beta.</p><a class="card-link" href="android.html">Join the Android beta →</a></div>
-          <div class="card reveal" style="--d: .9s"><div class="ico">🔒</div><h3>Private by design</h3><p>No account, no tracking. Chats, memories and files stay on your PC; the AI only reads folders you trust.</p><a class="card-link" href="private-ai-chat.html">Understand Boltchat privacy →</a></div>
+          <div class="card reveal" style="--d: .18s"><div class="ico">∑</div><h3>Beautiful math</h3><p>LaTeX, matrices and chemistry, typeset like a textbook.</p></div>
+          <div class="card reveal" style="--d: .24s"><div class="ico">🗣</div><h3>Voice chat</h3><p>Talk hands-free and Boltchat answers out loud. Interrupt any time. Or dictate with Whisper.</p></div>
+          <div class="card reveal" style="--d: .3s"><div class="ico">🧠</div><h3>You set how hard it thinks</h3><p>Quick, Balanced or Deep on reasoning models: speed when you want it, depth when you need it.</p></div>
+          <div class="card reveal" style="--d: .36s"><div class="ico">✦</div><h3>Remembers you</h3><p>Optional memory makes answers more personal. See and delete every memory in Settings.</p></div>
+          <div class="card reveal" style="--d: .42s"><div class="ico">🗂</div><h3>Projects</h3><p>Group chats with shared instructions and searchable files: PDF, Word, Excel, EPUB, code.</p></div>
+          <div class="card reveal" style="--d: .48s"><div class="ico">✎</div><h3>A coding agent that checks its work</h3><p>Plans, edits, runs your tests and tries your pages in a built-in browser. Every change is a diff you review, and every command passes a safety check.</p><a class="card-link" href="code-workspace.html">Explore the Code workspace →</a></div>
+          <div class="card reveal" style="--d: .54s"><div class="ico">🔔</div><h3>Finishes while you're away</h3><p>Close the window and get a notification when a reply or agent task is done.</p></div>
+          <div class="card reveal" style="--d: .6s"><div class="ico">📱</div><h3>On Android, too</h3><p>The same chat engine, tools and Projects, with replies that keep streaming after you leave the app. In beta.</p><a class="card-link" href="android.html">Join the Android beta →</a></div>
+          <div class="card reveal" style="--d: .66s"><div class="ico">🔒</div><h3>Private by design</h3><p>No account, no tracking. Chats, memories and files stay on your PC.</p><a class="card-link" href="private-ai-chat.html">Understand Boltchat privacy →</a></div>
         </div>
       </div>
     </section>
@@ -263,7 +261,7 @@
         <div class="faq-list reveal" style="--d: .08s">
           <details>
             <summary>What is Boltchat?</summary>
-            <p>Boltchat is a free app, for Windows and in beta on Android, for chatting with models available through Groq. It adds web search, Python code execution, voice input, image understanding, optional memory and a coding workspace around those models.</p>
+            <p>Boltchat is a free app, for Windows and in beta on Android, for chatting with models available through Groq. It adds web search, Python code execution, voice chat, adjustable reasoning, image understanding, optional memory and a coding workspace around those models.</p>
           </details>
           <details>
             <summary>Is there an Android version?</summary>
