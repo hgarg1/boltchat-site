@@ -56,12 +56,23 @@ A dependency-free static site — no build step, no framework, no tracking.
 ├── app-demo.css        The live app demos: Boltchat recreated in HTML/CSS, sharp at any size
 ├── phone-demo.css       The Android demo on android.html: the app in a phone frame, played by the same step player
 ├── site.js             Progressive enhancements: navbar, scroll reveal, demos, TOC
+├── app/                The Boltchat web app (built output; see below)
 ├── assets/             Icon, social image, leadership photo
 ├── scripts/             SEO validation and IndexNow notification
 ├── .github/workflows/   Automated SEO checks and discovery notification
 ├── robots.txt, sitemap.xml, llms.txt
 └── CNAME               Custom domain for GitHub Pages
 ```
+
+### The web app (`app/`)
+
+`app/` is the Boltchat web app, served at https://boltchat.harshit-garg.com/app/. It is **built output**: don't edit it here.
+It is produced from the app's own repository with `node web/build.js --out ../boltchat-site/app`, which bundles the desktop
+app's chat engine for the browser. It has no backend: chats, memories, project files and the API key stay in the visitor's
+browser, and the page's content security policy only allows requests to this site and `api.groq.com`.
+
+Because the web app stores its data on this origin, **no page on this site may load third-party scripts** (analytics, CDNs,
+widgets): any script running on the origin could read that data.
 
 ### Preview locally
 

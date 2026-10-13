@@ -1,0 +1,674 @@
+<!doctype html>
+<html lang="en" class="web">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self' https://api.groq.com; worker-src 'self' blob:; font-src 'self' data:; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <meta name="referrer" content="no-referrer">
+  <meta name="robots" content="noindex">
+  <meta name="description" content="Boltchat in your browser: fast AI chat on Groq's open models. Chats, memories and your API key stay in this browser.">
+  <meta name="theme-color" content="#111113">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="assets/icon-64.png">
+  <link rel="apple-touch-icon" href="assets/icon.png">
+  <title>Boltchat</title>
+  <link rel="stylesheet" href="vendor/katex/katex.min.css">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="workspace.css">
+  <link rel="stylesheet" href="projects.css">
+  <link rel="stylesheet" href="web.css">
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <img class="brand-mark" src="assets/icon-64.png" alt="">
+        <span class="brand-name">Boltchat</span>
+      </div>
+      <button class="new-chat" id="new-chat" title="New chat">
+        <span>＋</span> New chat
+      </button>
+      <input class="chat-search" id="chat-search" type="search" placeholder="Search chats">
+      <section class="project-section" id="project-section" aria-label="Projects">
+        <div class="project-head">
+          <span>Projects</span>
+          <button class="chat-item-action" id="new-project" title="New project" aria-label="New project">＋</button>
+        </div>
+        <div class="project-list" id="project-list"></div>
+      </section>
+      <nav class="chat-list" id="chat-list" aria-label="Conversations"></nav>
+      <div class="sidebar-footer">
+        <div class="limits" id="limits" hidden>
+          <div class="limit-row" id="limit-requests-row">
+            <span>Requests left today</span><span id="limit-requests">–</span>
+          </div>
+          <div class="meter"><div class="meter-fill" id="meter-requests"></div></div>
+          <div class="limit-row" id="limit-tokens-row">
+            <span>Tokens left this minute</span><span id="limit-tokens">–</span>
+          </div>
+          <div class="meter"><div class="meter-fill" id="meter-tokens"></div></div>
+          <div class="limit-note" id="limit-note"></div>
+        </div>
+        <button class="ghost-btn" id="open-settings" title="Settings (Ctrl+,)">⚙ Settings</button>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <button class="icon-btn" id="toggle-sidebar" title="Toggle sidebar">☰</button>
+        <div class="mode-switch" id="mode-switch" role="tablist" aria-label="Mode">
+          <span class="mode-indicator" aria-hidden="true"></span>
+          <button role="tab" data-mode="chat" aria-selected="true"><span class="mode-ico" aria-hidden="true">💬</span>Chat</button>
+          <button role="tab" data-mode="code" aria-selected="false" title="Code workspace (Ctrl+Shift+E)"><span class="mode-ico" aria-hidden="true">⌨</span>Code</button>
+        </div>
+        <div class="model-picker" id="model-picker"></div>
+        <div class="effort-picker" id="effort-picker" hidden></div>
+        <button class="project-chip" id="project-chip" hidden title="Open this project"></button>
+        <div class="topbar-spacer"></div>
+        <button class="icon-btn" id="theme-btn" title="Toggle theme">◐</button>
+      </header>
+
+      <!-- Code workspace: explorer / search / changes · Monaco editor · AI panel -->
+      <section class="workspace" id="workspace" hidden>
+        <div class="ws-empty" id="ws-empty">
+          <div class="ws-empty-card">
+            <div class="ws-empty-icon" aria-hidden="true">
+              <svg viewBox="0 0 96 80" width="96" height="80" fill="none">
+                <defs>
+                  <linearGradient id="ws-empty-grad" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0" stop-color="#22d3ee"/>
+                    <stop offset="0.5" stop-color="#8b5cf6"/>
+                    <stop offset="1" stop-color="#f55036"/>
+                  </linearGradient>
+                </defs>
+                <rect x="4" y="6" width="88" height="66" rx="12" stroke="url(#ws-empty-grad)" stroke-width="3"/>
+                <path d="M4 20h88" stroke="url(#ws-empty-grad)" stroke-width="3"/>
+                <circle cx="14" cy="13" r="2.2" fill="#f55036"/><circle cx="21" cy="13" r="2.2" fill="#f59e0b"/><circle cx="28" cy="13" r="2.2" fill="#22c55e"/>
+                <path d="M30 36l-9 9 9 9M66 36l9 9-9 9M54 32l-12 26" stroke="url(#ws-empty-grad)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <h1>Work on your files with AI</h1>
+            <p>Open a folder to edit its files in a VS Code–style editor and ask the model to read, search and change them. Every AI change is shown as a diff you can accept or reject.</p>
+            <button class="primary-btn" id="ws-open">Open folder…</button>
+            <div class="ws-recent" id="ws-recent"></div>
+          </div>
+        </div>
+
+        <div class="ws-body" id="ws-body" hidden>
+          <nav class="ws-rail" aria-label="Workspace views">
+            <button class="ws-rail-btn active" data-pane="explorer" title="Explorer (Ctrl+Shift+E)" aria-label="Explorer">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/></svg>
+            </button>
+            <button class="ws-rail-btn" data-pane="search" title="Search (Ctrl+Shift+F)" aria-label="Search">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>
+            </button>
+            <button class="ws-rail-btn" data-pane="changes" title="AI changes" aria-label="AI changes">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M18.5 15.5l.7 1.8 1.8.7-1.8.7-.7 1.8-.7-1.8-1.8-.7 1.8-.7z"/></svg>
+              <span class="ws-badge" id="ws-pending-badge" hidden></span>
+            </button>
+            <button class="ws-rail-btn" id="ws-browser-btn" title="Browser" aria-label="Browser">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17M12 3.5c2.5 2.6 3.6 5.4 3.6 8.5s-1.1 5.9-3.6 8.5c-2.5-2.6-3.6-5.4-3.6-8.5s1.1-5.9 3.6-8.5z"/></svg>
+            </button>
+            <button class="ws-rail-btn" id="ws-terminal-btn" title="Terminal (Ctrl+`)" aria-label="Terminal">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2.5"/><path d="M7 9l3 3-3 3M12.5 15H17"/></svg>
+            </button>
+            <div class="ws-rail-spacer"></div>
+            <button class="ws-rail-btn" id="ws-palette-btn" title="Command palette (Ctrl+Shift+P)" aria-label="Command palette">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3z"/></svg>
+            </button>
+          </nav>
+
+          <aside class="ws-side" id="ws-side">
+            <div class="ws-pane active" data-pane="explorer">
+              <header class="ws-pane-head">
+                <strong id="ws-folder-name"></strong>
+                <span class="ws-pane-actions">
+                  <button class="ws-mini" id="ws-new-file" title="New file" aria-label="New file">
+                    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 1.5H4.5a1.5 1.5 0 0 0-1.5 1.5v10a1.5 1.5 0 0 0 1.5 1.5h7A1.5 1.5 0 0 0 13 13V5.5z"/><path d="M9 1.5v4h4M8 8v4M6 10h4"/></svg>
+                  </button>
+                  <button class="ws-mini" id="ws-new-folder" title="New folder" aria-label="New folder">
+                    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 4.5a1.5 1.5 0 0 1 1.5-1.5h3l1.5 1.5H13a1.5 1.5 0 0 1 1.5 1.5v6a1.5 1.5 0 0 1-1.5 1.5H3A1.5 1.5 0 0 1 1.5 12z"/><path d="M8 7v4M6 9h4"/></svg>
+                  </button>
+                  <button class="ws-mini" id="ws-refresh" title="Refresh" aria-label="Refresh">
+                    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M13.5 8a5.5 5.5 0 1 1-1.6-3.9M13.5 2.5v3h-3"/></svg>
+                  </button>
+                  <button class="ws-mini" id="ws-collapse" title="Collapse folders" aria-label="Collapse folders">
+                    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="12" height="12" rx="2"/><path d="M5.5 8h5"/></svg>
+                  </button>
+                  <button class="ws-mini" id="ws-close-folder" title="Close folder" aria-label="Close folder">
+                    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M4 4l8 8M12 4l-8 8"/></svg>
+                  </button>
+                </span>
+              </header>
+              <div class="ws-tree" id="ws-tree" role="tree" tabindex="0"></div>
+            </div>
+
+            <div class="ws-pane" data-pane="search">
+              <header class="ws-pane-head"><strong>Search</strong></header>
+              <div class="ws-search-form">
+                <div class="ws-input-row">
+                  <input id="ws-search-input" type="text" placeholder="Search" spellcheck="false">
+                  <button class="ws-toggle" id="ws-search-case" title="Match case">Aa</button>
+                  <button class="ws-toggle" id="ws-search-word" title="Match whole word">ab</button>
+                  <button class="ws-toggle" id="ws-search-regex" title="Use regular expression">.*</button>
+                </div>
+                <div class="ws-input-row">
+                  <input id="ws-replace-input" type="text" placeholder="Replace" spellcheck="false">
+                  <button class="ws-mini" id="ws-replace-all" title="Replace all (you review the changes first)">⇄</button>
+                </div>
+                <input id="ws-search-include" type="text" placeholder="Files to include, e.g. src/**, *.ts" spellcheck="false">
+                <input id="ws-search-exclude" type="text" placeholder="Files to exclude" spellcheck="false">
+              </div>
+              <div class="ws-search-summary" id="ws-search-summary"></div>
+              <div class="ws-search-results" id="ws-search-results"></div>
+            </div>
+
+            <div class="ws-pane" data-pane="changes">
+              <header class="ws-pane-head">
+                <strong>AI changes</strong>
+                <span class="ws-pane-actions">
+                  <button class="ws-text-btn" id="ws-reject-all" title="Reject all pending changes">Reject all</button>
+                  <button class="ws-text-btn accent" id="ws-accept-all" title="Accept all pending changes">Accept all</button>
+                </span>
+              </header>
+              <div class="ws-changes" id="ws-changes"></div>
+              <div class="ws-history" id="ws-history"></div>
+            </div>
+          </aside>
+          <div class="ws-split" data-split="side" title="Drag to resize"></div>
+
+          <section class="ws-center">
+            <div class="ws-tabs" id="ws-tabs" role="tablist"></div>
+            <nav class="ws-crumbs" id="ws-crumbs" aria-label="File path" hidden></nav>
+            <div class="ws-diffbar" id="ws-diffbar" hidden>
+              <span class="ws-diffbar-title" id="ws-diffbar-title"></span>
+              <span class="ws-diffbar-nav">
+                <button class="ghost-btn small" id="ws-diff-prev" title="Previous change">↑</button>
+                <button class="ghost-btn small" id="ws-diff-next" title="Next change">↓</button>
+              </span>
+              <span class="topbar-spacer"></span>
+              <button class="ghost-btn small danger" id="ws-diff-reject">Reject file</button>
+              <button class="primary-btn small" id="ws-diff-accept">Accept file</button>
+            </div>
+            <div class="ws-banner" id="ws-banner" hidden></div>
+            <div class="ws-editor-host" id="ws-editor-host"></div>
+            <div class="ws-diff-host" id="ws-diff-host" hidden></div>
+            <div class="ws-placeholder" id="ws-placeholder">
+              <p><kbd>Ctrl</kbd><kbd>P</kbd> Open a file</p>
+              <p><kbd>Ctrl</kbd><kbd>Shift</kbd><kbd>P</kbd> Commands</p>
+              <p><kbd>Ctrl</kbd><kbd>K</kbd> Edit the selection with AI</p>
+              <p><kbd>Ctrl</kbd><kbd>L</kbd> Ask the AI about your files</p>
+            </div>
+            <div class="ws-loading" id="ws-loading" hidden>Loading editor…</div>
+
+            <!-- Browser tab: the page itself is a native view that main.js lays over #ws-browser-host -->
+            <div class="ws-browser" id="ws-browser" hidden>
+              <div class="ws-browser-bar">
+                <button class="ws-mini" id="ws-browser-back" title="Back" aria-label="Back"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3L5 8l5 5"/></svg></button>
+                <button class="ws-mini" id="ws-browser-forward" title="Forward" aria-label="Forward"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3l5 5-5 5"/></svg></button>
+                <button class="ws-mini" id="ws-browser-reload" title="Reload" aria-label="Reload"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M13.5 8a5.5 5.5 0 1 1-1.6-3.9M13.5 2.5v3h-3"/></svg></button>
+                <form class="ws-browser-url" id="ws-browser-form">
+                  <span class="ws-browser-lock" id="ws-browser-lock"></span>
+                  <input id="ws-browser-input" type="text" spellcheck="false" autocomplete="off" placeholder="Address, localhost:3000 or a project file like index.html">
+                </form>
+                <span class="ws-browser-agent" id="ws-browser-agent" hidden>✦ AI is using the browser</span>
+                <button class="ws-mini" id="ws-browser-devtools" title="Developer tools" aria-label="Developer tools"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 5L2.5 8l3 3M10.5 5l3 3-3 3M9 3.5l-2 9"/></svg></button>
+              </div>
+              <div class="ws-browser-progress" id="ws-browser-progress" hidden></div>
+              <div class="ws-browser-host" id="ws-browser-host">
+                <div class="ws-browser-empty" id="ws-browser-empty">
+                  <p>Open a local dev server (e.g. <code>localhost:5173</code>) or a page from this project (e.g. <code>index.html</code>).</p>
+                  <p>The AI can use this browser to test web pages it changes.</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Terminal panel -->
+            <div class="ws-split-h" id="ws-term-split" hidden title="Drag to resize"></div>
+            <section class="ws-terminal" id="ws-terminal" hidden>
+              <header class="ws-term-head">
+                <div class="ws-term-tabs" id="ws-term-tabs" role="tablist"></div>
+                <button class="ws-mini" id="ws-term-new" title="New terminal" aria-label="New terminal"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M8 3v10M3 8h10"/></svg></button>
+                <button class="ws-mini" id="ws-term-kill" title="Close this terminal" aria-label="Close this terminal"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4.5h10M6.5 4.5V3h3v1.5M4.5 4.5l.7 8.5h5.6l.7-8.5"/></svg></button>
+                <button class="ws-mini" id="ws-term-hide" title="Hide panel (Ctrl+`)" aria-label="Hide terminal panel"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6l4 4 4-4"/></svg></button>
+              </header>
+              <div class="ws-term-body" id="ws-term-body"></div>
+            </section>
+          </section>
+          <div class="ws-split" data-split="ai" title="Drag to resize"></div>
+
+          <aside class="ws-ai" id="ws-ai">
+            <header class="ws-ai-head">
+              <strong>AI</strong>
+              <div class="ws-ai-chat-picker" id="ws-ai-chat-picker"></div>
+              <button class="ws-mini" id="ws-ai-undo" title="Undo the last applied AI turn" hidden>↶</button>
+              <button class="ws-mini" id="ws-ai-new" title="New conversation">＋</button>
+              <button class="ws-mini" id="ws-ai-close" title="Hide AI panel (Ctrl+Alt+B)">✕</button>
+            </header>
+            <div class="ws-ai-thread" id="ws-ai-thread">
+              <div class="ws-ai-empty" id="ws-ai-empty">
+                <p>Ask about this folder, or describe a change.</p>
+                <div class="ws-ai-ideas">
+                  <button>Explain what this project does</button>
+                  <button>Find likely bugs in the open file</button>
+                  <button>Add comments to the selected code</button>
+                </div>
+              </div>
+            </div>
+            <div class="ws-ai-notice" id="ws-ai-notice" hidden></div>
+            <div class="ws-ai-composer">
+              <div class="ws-chips" id="ws-chips"></div>
+              <textarea id="ws-ai-input" rows="2" placeholder="Ask or describe a change…  (@ to add a file)" role="combobox" aria-autocomplete="list" aria-controls="ws-mention-list" aria-expanded="false"></textarea>
+              <div class="ws-mention" id="ws-mention" hidden></div>
+              <div class="ws-ai-actions">
+                <button class="ws-ai-at" id="ws-ai-at" title="Add a file or folder to the AI context (@)" aria-label="Add a file or folder to the AI context">@</button>
+                <span class="ws-ai-hint" id="ws-ai-hint"></span>
+                <button class="send-btn" id="ws-ai-send" title="Send (Enter)">↑</button>
+              </div>
+            </div>
+          </aside>
+        </div>
+
+        <footer class="ws-status" id="ws-status" hidden>
+          <span id="ws-status-folder"></span>
+          <span class="topbar-spacer"></span>
+          <span id="ws-status-pending"></span>
+          <span id="ws-status-dirty"></span>
+          <span id="ws-status-pos"></span>
+          <span id="ws-status-lang"></span>
+          <button class="ws-status-btn" id="ws-status-eol" title="Line endings"></button>
+          <span id="ws-status-enc"></span>
+        </footer>
+
+        <div class="ws-palette" id="ws-palette" hidden>
+          <input id="ws-palette-input" type="text" spellcheck="false" autocomplete="off">
+          <div class="ws-palette-list" id="ws-palette-list" role="listbox"></div>
+        </div>
+        <div class="ws-menu" id="ws-menu" hidden></div>
+        <div class="ws-inline" id="ws-inline" hidden>
+          <textarea id="ws-inline-input" rows="1" placeholder="Edit selection: describe the change, Enter to run, Esc to cancel"></textarea>
+          <div class="ws-inline-status" id="ws-inline-status"></div>
+        </div>
+      </section>
+
+      <section class="onboarding" id="onboarding" hidden>
+        <div class="card">
+          <img class="onboard-mark" src="assets/icon.png" alt="">
+          <h1>Connect your Groq key</h1>
+          <p>Paste an API key from the Groq console. It is kept in this browser and only ever sent to Groq, straight from this page. Boltchat has no servers and never sees it.</p>
+          <form id="key-form" class="key-form">
+            <input id="key-input" type="password" placeholder="gsk_…" autocomplete="off" spellcheck="false">
+            <button type="submit" class="primary-btn" id="key-save">Connect</button>
+          </form>
+          <p class="form-error" id="key-error" hidden></p>
+          <button class="link-btn" data-href="https://console.groq.com/keys">Get a free key at console.groq.com →</button>
+        </div>
+      </section>
+
+      <section class="project-view" id="project-view" hidden aria-label="Project"></section>
+
+      <section class="thread" id="thread" aria-live="polite">
+        <div class="empty" id="empty">
+          <h1>What can I help with?</h1>
+          <p class="empty-sub">Answers stream at hundreds of tokens per second. AI can make mistakes — check important facts.</p>
+          <div class="suggestions" id="suggestions"></div>
+        </div>
+        <div class="messages" id="messages"></div>
+      </section>
+
+      <footer class="composer-wrap" id="composer-wrap">
+        <div class="attachments" id="attachments" hidden></div>
+        <div class="slash-menu" id="slash-menu" role="listbox" hidden></div>
+        <form class="composer" id="composer">
+          <span class="mode-chip" id="mode-chip" hidden></span>
+          <button type="button" class="icon-btn" id="attach-btn" title="Attach image (vision models only)">📎</button>
+          <input type="file" id="file-input" accept="image/png,image/jpeg,image/webp,image/gif" multiple hidden>
+          <textarea id="prompt" rows="1" placeholder="Message Boltchat…  (type / for commands)"></textarea>
+          <button type="button" class="icon-btn" id="mic-btn" title="Voice input (Whisper)">🎙</button>
+          <button type="button" class="icon-btn" id="voice-chat-btn" title="Voice chat (Ctrl+Shift+V)" aria-label="Start voice chat"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 10v4M8 7v10M12 4v16M16 8v8M20 11v2"/></svg></button>
+          <button type="submit" class="send-btn" id="send-btn" title="Send">↑</button>
+        </form>
+        <div class="composer-hint" id="composer-hint"></div>
+      </footer>
+    </main>
+  </div>
+
+  <div class="modal-backdrop" id="settings-modal" hidden>
+    <div class="settings" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+      <button class="icon-btn settings-close" id="close-settings" title="Close (Esc)">✕</button>
+      <nav class="settings-nav" aria-label="Settings sections">
+        <div class="settings-nav-head">
+          <img src="assets/icon-64.png" alt="">
+          <div>
+            <h2 id="settings-title">Settings</h2>
+            <span class="settings-saved" id="settings-saved">All changes saved</span>
+          </div>
+        </div>
+        <button class="settings-tab active" data-section="model"><span class="tab-ico">◆</span>Model</button>
+        <button class="settings-tab" data-section="behavior"><span class="tab-ico">✎</span>Behavior</button>
+        <button class="settings-tab" data-section="tools"><span class="tab-ico">⚒</span>Tools</button>
+        <button class="settings-tab" data-section="voice"><span class="tab-ico">◉</span>Voice chat</button>
+        <button class="settings-tab" data-section="memory"><span class="tab-ico">✦</span>Memory</button>
+        <button class="settings-tab" data-section="code"><span class="tab-ico">⌨</span>Code</button>
+        <button class="settings-tab" data-section="startup"><span class="tab-ico">⏻</span>Startup</button>
+        <button class="settings-tab" data-section="appearance"><span class="tab-ico">◐</span>Appearance</button>
+        <button class="settings-tab" data-section="key"><span class="tab-ico">⚿</span>API key</button>
+        <button class="settings-tab" data-section="about"><span class="tab-ico">ⓘ</span>About</button>
+      </nav>
+
+      <div class="settings-body">
+
+        <section class="settings-section active" data-section="model">
+          <header><h3>Model</h3><p>What answers your messages, and how.</p></header>
+          <div class="setting">
+            <div class="setting-label"><strong>Default model</strong><span>Used for new messages. You can also switch from the top bar.</span></div>
+            <div id="default-model-dropdown"></div>
+          </div>
+          <div class="setting">
+            <div class="setting-label"><strong>Thinking</strong><span id="effort-note">How hard the model thinks before it answers.</span></div>
+            <div id="effort-dropdown"></div>
+          </div>
+          <div class="setting">
+            <div class="setting-label"><strong>Creativity</strong><span>Lower is focused and repeatable, higher is more varied.</span></div>
+            <div class="segmented" id="temp-presets">
+              <button data-temp="0.2"><b>Precise</b><small>0.2</small></button>
+              <button data-temp="0.7"><b>Balanced</b><small>0.7</small></button>
+              <button data-temp="1.2"><b>Creative</b><small>1.2</small></button>
+            </div>
+            <div class="slider-row">
+              <input id="temperature" type="range" min="0" max="2" step="0.05" aria-label="Temperature">
+              <span class="slider-value" id="temperature-value"></span>
+            </div>
+          </div>
+          <div class="setting">
+            <div class="setting-label"><strong>Max answer length</strong><span id="max-tokens-note">Upper limit on tokens per reply.</span></div>
+            <div id="max-tokens-dropdown"></div>
+          </div>
+        </section>
+
+        <section class="settings-section" data-section="behavior">
+          <header><h3>Behavior</h3><p>A system prompt shapes every reply in every chat.</p></header>
+          <div class="setting">
+            <div class="setting-label"><strong>Start from a template</strong></div>
+            <div class="chips" id="prompt-templates"></div>
+          </div>
+          <div class="setting setting-inline">
+            <div class="setting-label"><strong>🔔 Chime when a reply is done</strong><span>A soft two-note bell when an answer finishes, handy while you're in another window.</span></div>
+            <button class="ghost-btn small" id="chime-preview" title="Play the chime">▶ Preview</button>
+            <button class="switch" role="switch" id="chime-switch" aria-label="Chime when a reply is done"><span></span></button>
+          </div>
+          <div class="setting setting-inline">
+            <div class="setting-label"><strong>✨ Fresh start-screen ideas</strong><span>The new-chat buttons are drawn from your memories and from ideas the model comes up with, refreshed every few hours. Off shows a fixed set and makes no extra requests.</span></div>
+            <button class="switch" role="switch" id="suggestions-switch" aria-label="Fresh start-screen ideas"><span></span></button>
+          </div>
+          <div class="setting">
+            <div class="setting-label row"><strong>System prompt</strong><span class="char-count" id="prompt-count"></span></div>
+            <textarea id="system-prompt" rows="7" placeholder="e.g. You are a concise assistant. Prefer bullet points and short answers."></textarea>
+          </div>
+        </section>
+
+        <section class="settings-section" data-section="tools">
+          <header><h3>Tools</h3><p>Let the model reach beyond its training data. Groq runs these tools for you — nothing to set up.</p></header>
+          <div class="tool-cards" id="tool-cards"></div>
+          <div class="tool-note" id="tool-note"></div>
+          <div class="setting">
+            <div class="setting-label"><strong>🎙 Voice input</strong><span>The mic button in the message box transcribes your speech with OpenAI's Whisper, running on Groq.</span></div>
+            <div id="voice-model-dropdown"></div>
+          </div>
+          <div class="setting">
+            <div class="setting-label"><strong>Slash commands</strong><span>Type <kbd>/</kbd> in the message box.</span></div>
+            <div class="slash-list" id="slash-list"></div>
+          </div>
+        </section>
+
+        <section class="settings-section" data-section="voice">
+          <header><h3>Voice chat</h3><p>A hands-free spoken conversation: Boltchat listens, answers out loud, and you can interrupt. Audio is never saved; it is sent to Groq to be transcribed, and the reply text is sent to be spoken.</p></header>
+          <div class="setting">
+            <div class="setting-label"><strong>Voice</strong><span>Who reads the replies. Uses Groq's Orpheus text to speech (a preview model).</span></div>
+            <div id="vc-voice-dropdown"></div>
+          </div>
+          <div class="setting">
+            <div class="setting-label"><strong>Answering model</strong><span>Voice replies are short and spoken, so a fast model without a reasoning phase feels best. Web search and the code runner switch to GPT OSS when you turn them on in a call.</span></div>
+            <div id="vc-llm-dropdown"></div>
+          </div>
+          <div class="setting">
+            <div class="setting-label"><strong>How you talk</strong><span>Hands-free listens for you to pause. Push to talk records only while you hold Space or the orb.</span></div>
+            <div id="vc-mode-dropdown"></div>
+          </div>
+          <div class="setting">
+            <div class="setting-label"><strong>Wait after you stop talking</strong><span>How long a pause means you are done. Shorter feels snappier but may cut you off mid-thought.</span></div>
+            <div id="vc-pause-dropdown"></div>
+          </div>
+          <div class="setting setting-inline">
+            <div class="setting-label"><strong>Interrupt by speaking</strong><span>Talk over the model to cut it off. Works best with headphones; on speakers the mic can hear the model and cut itself off. Tap the orb, Space or Esc always work.</span></div>
+            <button class="switch" role="switch" id="vc-interrupt-switch" aria-label="Interrupt by speaking"><span></span></button>
+          </div>
+          <div class="setting">
+            <div class="setting-label"><strong>Headphones</strong><span>With headphones, interrupting reacts faster because the mic can't hear the model. Automatic guesses from the name of the sound device in use.</span></div>
+            <div id="vc-headphones-dropdown"></div>
+          </div>
+          <div class="setting setting-inline">
+            <div class="setting-label"><strong>Show captions</strong><span>The words of the conversation on the call screen.</span></div>
+            <button class="switch" role="switch" id="vc-captions-switch" aria-label="Show captions"><span></span></button>
+          </div>
+          <div class="setting setting-inline">
+            <div class="setting-label"><strong>Say something while searching</strong><span>A short phrase such as "Let me look that up" while a web search or code run is under way.</span></div>
+            <button class="switch" role="switch" id="vc-filler-switch" aria-label="Say something while searching"><span></span></button>
+          </div>
+          <div class="setting setting-inline">
+            <div class="setting-label"><strong>Use the system voice as a backup</strong><span>If Groq's speech is rate limited or unavailable, read replies with a voice built into your browser or device instead of going quiet.</span></div>
+            <button class="switch" role="switch" id="vc-fallback-switch" aria-label="Use the system voice as a backup"><span></span></button>
+          </div>
+          <div class="setting">
+            <div class="setting-label"><strong>Longest spoken answer</strong><span>Past this length the model stops talking and says it can keep going; the full answer stays on screen.</span></div>
+            <div id="vc-cap-dropdown"></div>
+          </div>
+          <div class="setting">
+            <div class="setting-label"><strong>End a quiet call after</strong><span>Closes the microphone if nobody says anything for a while.</span></div>
+            <div id="vc-autoend-dropdown"></div>
+          </div>
+          <div class="tool-note">Start a call with the waveform button next to the mic, or press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>V</kbd>. Speech costs a small amount on Groq's pay-as-you-go plan: roughly 4 cents an hour to transcribe and 2 cents per thousand spoken characters.</div>
+        </section>
+
+        <section class="settings-section" data-section="memory">
+          <header><h3>Memory</h3><p>Let Boltchat get to know you over time. Memories are stored in this browser and sent to Groq along with your messages.</p></header>
+          <div class="setting setting-inline">
+            <div class="setting-label"><strong>Use memory</strong><span>Every chat starts with what Boltchat remembers about you. Ask “remember that…”, “what do you remember?” or “forget…” in any chat.</span></div>
+            <button class="switch" role="switch" id="memory-switch" aria-label="Use memory"><span></span></button>
+          </div>
+          <div class="setting setting-inline">
+            <div class="setting-label"><strong>Learn automatically</strong><span>After each reply, a small model notes lasting facts you share about yourself. Uses one extra request per reply.</span></div>
+            <button class="switch" role="switch" id="memory-learn-switch" aria-label="Learn automatically"><span></span></button>
+          </div>
+          <div class="tool-note" id="memory-note"></div>
+          <div class="setting">
+            <div class="setting-label row"><strong>What Boltchat remembers</strong><span class="char-count" id="memory-count"></span></div>
+            <form class="key-form memory-form" id="memory-form">
+              <input id="memory-input" type="text" maxlength="500" placeholder="Add a memory, e.g. I prefer TypeScript over JavaScript" autocomplete="off">
+              <button type="submit" class="primary-btn">Add</button>
+            </form>
+            <div class="memory-list" id="memory-list"></div>
+            <button class="ghost-btn small danger" id="memory-clear">Forget everything</button>
+          </div>
+        </section>
+
+        <section class="settings-section" data-section="code">
+          <header><h3>Code</h3><p>The Code workspace lets the model read, search and change text files in folders you trust.</p></header>
+          <div class="setting">
+            <div class="setting-label"><strong>Apply AI changes</strong><span>Review shows every change as a diff first. Automatic writes changes straight away; each AI turn can still be undone.</span></div>
+            <div class="segmented" id="code-apply-mode">
+              <button data-mode="review"><b>Review first</b><small>Recommended</small></button>
+              <button data-mode="auto"><b>Apply automatically</b><small>Undo available</small></button>
+            </div>
+          </div>
+          <div class="setting setting-inline">
+            <div class="setting-label"><strong>Let the agent use the browser</strong><span>For web projects: it opens pages in the built-in browser, clicks and types to test them, reads console errors, and asks a vision model to check how screenshots look. Sites outside your project need your OK.</span></div>
+            <button class="switch" role="switch" id="code-browser-switch" aria-label="Let the agent use the browser"><span></span></button>
+          </div>
+          <div class="setting">
+            <div class="setting-label"><strong>Let the agent run commands</strong><span>So it can run your tests and builds and fix what fails. Commands run in the open folder with your user account; environment variables that look like secrets are removed.</span></div>
+            <div class="segmented" id="code-commands">
+              <button data-commands="off"><b>Off</b><small>Never</small></button>
+              <button data-commands="ask"><b>Ask every time</b><small>You approve each</small></button>
+              <button data-commands="gated"><b>Smart gate</b><small>Safe ones run, risky ones ask</small></button>
+            </div>
+            <p class="setting-note">Smart gate: GPT-OSS 20B checks each command first — tests, builds and read-only commands run; installs, network access, git history changes and deletions ask you; anything touching the system, other folders or secrets is blocked.</p>
+          </div>
+          <div class="setting">
+            <div class="setting-label row"><strong>Trusted folders</strong><span class="char-count" id="code-folder-count"></span></div>
+            <p class="setting-note">Only these folders can be opened in the workspace. File contents are sent to Groq only when the model reads them to answer you.</p>
+            <div class="memory-list" id="code-folders"></div>
+          </div>
+        </section>
+
+        <section class="settings-section" data-section="startup">
+          <header><h3>Startup &amp; background</h3><p>How Boltchat starts with Windows, and what happens when you close it.</p></header>
+          <div class="setting setting-inline">
+            <div class="setting-label"><strong>🚀 Open when I sign in to Windows</strong><span id="startup-login-note">Boltchat starts with Windows, so it's ready the moment you need it.</span></div>
+            <button class="ghost-btn small" id="startup-windows-settings" hidden>Open Windows settings</button>
+            <button class="switch" role="switch" id="startup-login-switch" aria-label="Open when I sign in to Windows"><span></span></button>
+          </div>
+          <div class="setting setting-inline" id="startup-quiet-row">
+            <div class="setting-label"><strong>🌙 Start quietly</strong><span id="startup-quiet-note">When it opens at sign-in, it waits minimized (or in the notification area) instead of popping up.</span></div>
+            <button class="switch" role="switch" id="startup-quiet-switch" aria-label="Start quietly"><span></span></button>
+          </div>
+          <div class="setting">
+            <div class="setting-label"><strong>When I close the window</strong><span>Replies and coding-agent tasks run inside Boltchat, so quitting stops them.</span></div>
+            <div class="segmented" id="startup-close">
+              <button data-close="quit"><b>Quit Boltchat</b><small>Close means close</small></button>
+              <button data-close="tray"><b>Keep running in the tray</b><small>Work keeps going</small></button>
+            </div>
+            <p class="setting-note" id="startup-close-note"></p>
+          </div>
+          <div class="setting setting-inline">
+            <div class="setting-label"><strong>✋ Ask before quitting mid-task</strong><span>If a reply or the coding agent is still working when you quit, choose to let it finish in the background, quit now, or stay.</span></div>
+            <button class="switch" role="switch" id="startup-confirm-switch" aria-label="Ask before quitting mid-task"><span></span></button>
+          </div>
+          <div class="setting setting-inline">
+            <div class="setting-label"><strong>🔔 Notify me about background work</strong><span>A Windows notification when a reply or agent task finishes, fails or needs your OK while Boltchat isn't the window you're using. Click it to jump right there.</span></div>
+            <button class="ghost-btn small" id="startup-notify-test" title="Send a test notification">▶ Test</button>
+            <button class="switch" role="switch" id="startup-notify-switch" aria-label="Notify me about background work"><span></span></button>
+          </div>
+        </section>
+
+        <section class="settings-section" data-section="appearance">
+          <header><h3>Appearance</h3><p>Make it yours. Changes apply instantly.</p></header>
+          <div class="setting">
+            <div class="setting-label"><strong>Theme</strong></div>
+            <div class="theme-cards" id="theme-cards">
+              <button data-theme-choice="system"><span class="theme-preview split"><i></i><i></i></span>Match device</button>
+              <button data-theme-choice="dark"><span class="theme-preview dark"><i></i><i></i></span>Dark</button>
+              <button data-theme-choice="light"><span class="theme-preview light"><i></i><i></i></span>Light</button>
+            </div>
+          </div>
+          <div class="setting">
+            <div class="setting-label"><strong>Accent color</strong></div>
+            <div class="swatches" id="accent-swatches"></div>
+          </div>
+          <div class="setting">
+            <div class="setting-label"><strong>Text size</strong></div>
+            <div id="text-size-dropdown"></div>
+          </div>
+        </section>
+
+        <section class="settings-section" data-section="key">
+          <header><h3>API key</h3><p>Your key stays in this browser and is only sent to Groq.</p></header>
+          <div class="key-card">
+            <div class="key-status"><span class="status-dot" id="key-dot"></span><strong id="key-status">Not connected</strong></div>
+            <div class="key-meta" id="key-meta"></div>
+            <div class="key-actions">
+              <button class="primary-btn" id="test-key">Test connection</button>
+              <button class="ghost-btn" id="change-key">Use a different key</button>
+              <button class="ghost-btn danger" id="remove-key">Remove saved key</button>
+            </div>
+            <div class="test-result" id="test-result" hidden></div>
+          </div>
+          <div class="usage-card" id="usage-card" hidden>
+            <div class="setting-label"><strong>Your Groq rate limits</strong><span id="usage-model"></span></div>
+            <div class="usage-grid">
+              <div><span class="usage-num" id="usage-req"></span><span class="usage-label">requests left today</span><span class="usage-reset" id="usage-req-reset"></span></div>
+              <div><span class="usage-num" id="usage-tok"></span><span class="usage-label">tokens left this minute</span><span class="usage-reset" id="usage-tok-reset"></span></div>
+            </div>
+            <p class="setting-note">Groq sends these with every reply. They're for your whole Groq organization and for this model; your plan sets how high they are.</p>
+          </div>
+          <button class="link-btn" data-href="https://console.groq.com/settings/limits">See your exact limits at console.groq.com →</button>
+          <button class="link-btn" data-href="https://console.groq.com/keys">Manage keys at console.groq.com →</button>
+        </section>
+
+        <section class="settings-section" data-section="about">
+          <div class="about-hero">
+            <img src="assets/icon.png" alt="">
+            <div>
+              <h3>Boltchat</h3>
+              <p id="about-version"></p>
+              <p class="about-disclaimer">Answers are written by AI models running on Groq and can be wrong. Use ⚑ Report on any reply that’s harmful or misleading. Not affiliated with Groq, Inc.</p>
+            </div>
+          </div>
+          <div class="about-list">
+            <div class="web-data"><span>Chats, memories &amp; settings<small id="web-storage-note">Kept in this browser only</small></span><span class="web-data-actions"><button class="ghost-btn small" id="web-backup">Download backup</button><button class="ghost-btn small" id="web-restore">Restore…</button><button id="open-data" hidden></button><input type="file" id="web-restore-file" accept=".zip,application/zip" hidden></span></div>
+            <div><span>Everything Boltchat keeps in this browser</span><button class="ghost-btn small danger" id="web-erase">Erase…</button></div>
+            <div><span>Windows app, with the Code workspace</span><button class="ghost-btn small" data-href="https://boltchat.harshit-garg.com/">Open</button></div>
+            <div><span>Groq console</span><button class="ghost-btn small" data-href="https://console.groq.com">Open</button></div>
+            <div><span>Model docs</span><button class="ghost-btn small" data-href="https://console.groq.com/docs/models">Open</button></div>
+            <div><span>Privacy policy</span><button class="ghost-btn small" data-href="https://boltchat.harshit-garg.com/privacy.html">Open</button></div>
+            <div><span>Terms of use</span><button class="ghost-btn small" data-href="https://boltchat.harshit-garg.com/terms.html">Open</button></div>
+            <div><span>Legal &amp; licenses</span><button class="ghost-btn small" data-href="https://boltchat.harshit-garg.com/legal.html">Open</button></div>
+          </div>
+          <div class="shortcut-list">
+            
+            <div><span>Settings</span><span><kbd>Ctrl</kbd><kbd>,</kbd></span></div>
+            <div><span>Send</span><span><kbd>Enter</kbd></span></div>
+            <div><span>New line</span><span><kbd>Shift</kbd><kbd>Enter</kbd></span></div>
+            <div><span>Stop reply / close</span><span><kbd>Esc</kbd></span></div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Voice chat: a full-window overlay while a hands-free call is running (voice-chat-ui.js) -->
+  <div class="voice-overlay" id="voice-overlay" role="dialog" aria-modal="true" aria-label="Voice chat" tabindex="-1" hidden>
+    <div class="voice-top">
+      <span class="voice-title"><i class="voice-live" aria-hidden="true"></i> Voice chat</span>
+      <span class="voice-model" id="voice-model"></span>
+    </div>
+    <div class="voice-stage">
+      <button type="button" class="voice-orb" id="voice-orb" aria-label="Tap to interrupt" tabindex="-1">
+        <span class="orb-ring r2"></span><span class="orb-ring"></span><span class="orb-core"></span>
+      </button>
+      <div class="voice-state" id="voice-state" aria-live="polite">Listening</div>
+      <div class="voice-hint" id="voice-hint"></div>
+    </div>
+    <div class="voice-captions" id="voice-captions" aria-live="polite">
+      <p class="cap-user" id="cap-user"></p>
+      <p class="cap-model" id="cap-model"></p>
+    </div>
+    <div class="voice-controls">
+      <button type="button" class="voice-btn" id="voice-mute" aria-pressed="false" title="Mute the microphone (M)">Mute</button>
+      <button type="button" class="voice-btn" id="voice-interrupt" title="Stop the reply (Space)" disabled>Interrupt</button>
+      <button type="button" class="voice-btn end" id="voice-end" title="End the call (Esc)">End</button>
+    </div>
+    <div class="voice-chips">
+      <button type="button" class="voice-chip" id="voice-web" aria-pressed="false" title="Let the model search the web">🌐 Web</button>
+      <button type="button" class="voice-chip" id="voice-code" aria-pressed="false" title="Let the model run Python">🐍 Code</button>
+    </div>
+  </div>
+
+  <script src="vendor/marked.umd.js"></script>
+  <script src="vendor/purify.min.js"></script>
+  <script src="vendor/katex/katex.min.js"></script>
+  <script src="vendor/katex/mhchem.min.js"></script>
+  <script src="engine.js"></script>
+  <script src="conversation-history.js"></script>
+  <script src="project-context.js"></script>
+  <script src="renderer.js"></script>
+  <script src="projects.js"></script>
+  <script src="project-files-ui.js"></script>
+  <script src="project-memory-ui.js"></script>
+  <script src="workspace.js"></script>
+  <script src="voice-chat.js"></script>
+  <script src="voice-chat-ui.js"></script>
+  <script src="web-shell.js"></script>
+</body>
+</html>

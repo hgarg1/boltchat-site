@@ -39,6 +39,7 @@
         <span class="nav-indicator" aria-hidden="true"></span>
           <a href="./#features">Features</a>
           <a href="android.html">Android</a>
+          <a href="app/">Web app</a>
           <a href="leadership.html">Leadership</a>
           <a href="privacy.html" aria-current="page">Privacy</a>
           <a href="terms.html">Terms</a>
@@ -55,21 +56,21 @@
     <div class="wrap">
       <span class="pill">Privacy</span>
       <h1>Privacy Policy</h1>
-      <p class="updated">Effective September 27, 2026 · Updated September 28, 2026</p>
+      <p class="updated">Effective September 27, 2026 · Updated October 12, 2026</p>
     </div>
   </section>
 
   <main id="main" class="doc">
     <div class="wrap doc-layout">
-      <nav class="toc" aria-label="On this page"><strong>On this page</strong><a href="#who">Who we are</a><a href="#stored">Information stored on your PC</a><a href="#groq">Information sent to Groq</a><a href="#memory">Memory</a><a href="#news">News headlines</a><a href="#code">Code workspace</a><a href="#browser">Terminal and browser</a><a href="#not">What we don't collect</a><a href="#reports">Reporting a response</a><a href="#contact-form">Contact form</a><a href="#store">Microsoft Store</a><a href="#choices">Your choices and deleting data</a><a href="#children">Children</a><a href="#changes">Changes to this policy</a><a href="#contact">Contact</a></nav>
+      <nav class="toc" aria-label="On this page"><strong>On this page</strong><a href="#who">Who we are</a><a href="#stored">Information stored on your PC</a><a href="#groq">Information sent to Groq</a><a href="#memory">Memory</a><a href="#news">News headlines</a><a href="#code">Code workspace</a><a href="#browser">Terminal and browser</a><a href="#web">Boltchat in your browser</a><a href="#not">What we don't collect</a><a href="#reports">Reporting a response</a><a href="#contact-form">Contact form</a><a href="#store">Microsoft Store</a><a href="#choices">Your choices and deleting data</a><a href="#children">Children</a><a href="#changes">Changes to this policy</a><a href="#contact">Contact</a></nav>
       <article class="doc-body">
 
       <div class="callout">
-        <p><strong>The short version:</strong> Boltchat has no accounts, no analytics and no servers of its own. Your chats — and, if you turn memory on, what Boltchat remembers about you — are stored only on your PC. When you send a message, it goes directly from your PC to Groq, the AI provider you connect with your own API key. The only other services the app contacts are a few public news websites, to download their lists of headlines; nothing about you is sent to them.</p>
+        <p><strong>The short version:</strong> Boltchat has no accounts, no analytics and no servers of its own. Your chats — and, if you turn memory on, what Boltchat remembers about you — are stored only on your PC. When you send a message, it goes directly from your PC to Groq, the AI provider you connect with your own API key. The only other services the app contacts are a few public news websites, to download their lists of headlines; nothing about you is sent to them. In the <a href="#web">web app</a>, “your PC” means your browser: everything is stored there, and requests go from it straight to Groq.</p>
       </div>
 
       <h2 id="who">Who we are</h2>
-      <p>Boltchat is developed by Harshit Garg ("we", "us"). This policy explains how the Boltchat app for Windows and this website handle information.</p>
+      <p>Boltchat is developed by Harshit Garg ("we", "us"). This policy explains how the Boltchat app for Windows, the Boltchat web app and this website handle information.</p>
 
       <h2 id="stored">Information stored on your PC</h2>
       <p>Boltchat keeps the following on your computer only, in its app data folder (for the Store version, a private folder Windows manages for the app):</p>
@@ -130,6 +131,17 @@
         <li><strong>The agent in the browser.</strong> If you allow it (Settings → Code, on by default), the coding agent can open local pages and files from the opened folder, click and type in them to test your project, and read the page's console messages. It needs your OK before opening any other website. Page text it reads is sent to Groq; when it checks how a page looks, a screenshot of the browser area is sent to a vision model on Groq.</li>
       </ul>
 
+      <h2 id="web">Boltchat in your browser</h2>
+      <p>The <a href="app/">web app</a> is the same chat app running entirely inside your browser. This website only delivers the app's files; it has no server that receives, processes or stores anything you do in the app.</p>
+      <ul>
+        <li><strong>Where your data is.</strong> Your chats, settings, memories, projects and their files, and your Groq API key are kept in your browser's storage for this site, on your device. They are stored encrypted with a key your browser holds and that the page cannot export, so they are not readable as plain text in the browser's files. This is not a password: anyone who can use your browser profile can open the app, so protect your device as you would for any signed-in website. We never receive a copy of any of it.</li>
+        <li><strong>Where requests go.</strong> Messages, attached images, voice audio and text to be spoken go straight from your browser to Groq with your key, exactly as described under <a href="#groq">Information sent to Groq</a>. The page is restricted by its content security policy to contacting this website (for its own files) and <code>api.groq.com</code>, and nothing else. It uses no cookies, analytics or third-party scripts.</li>
+        <li><strong>Project files are searched in your browser.</strong> The small language model that finds relevant passages is downloaded from this website once and runs on your device; your files are not uploaded to be indexed. Only the passages that match a message are sent to Groq with it.</li>
+        <li><strong>What is different from the Windows app.</strong> The web app does not download news headlines, and it has no Code workspace, terminal or built-in browser.</li>
+        <li><strong>Keeping and deleting.</strong> Browsers can clear a site's storage, for example when you clear browsing data or, on some devices, after long periods without use; a private or incognito window keeps nothing after it closes. <strong>Settings → About</strong> has <strong>Download backup</strong> (a file with everything except your API key), <strong>Restore</strong> and <strong>Erase</strong>, which deletes everything the app keeps in that browser. Your data is not synced between browsers or devices.</li>
+        <li><strong>Hosting and extensions.</strong> As with any website, the host that serves these files (GitHub Pages) receives your IP address and basic technical details of the request. Browser extensions you have installed may be able to read pages you open, including this one; that is outside our control.</li>
+      </ul>
+
       <h2 id="not">What we don't collect</h2>
       <p>Boltchat does not include analytics, advertising, crash-reporting or tracking code. It does not create an account, and it does not send your data to us or to anyone other than Groq. (The news headline downloads described above send no personal data. Websites you or the agent open in the built-in browser receive what any website receives from a visitor.) This website does not use cookies or analytics.</p>
 
@@ -151,6 +163,7 @@
         <li>Stop trusting a folder in <strong>Settings → Code</strong>. Workspace conversations and undo copies are kept in the <code>workspaces</code> folder inside the app data folder; delete it to remove them.</li>
         <li>Turn off the news download in <strong>Settings → Behavior → Fresh start-screen ideas</strong>.</li>
         <li>Uninstalling removes the app; to remove everything, also delete the Boltchat folder in your app data (Settings → About → Open folder shows where it is).</li>
+        <li>In the web app, <strong>Settings → About → Erase</strong> deletes everything it keeps in that browser, including your key; clearing this site's data in your browser does the same.</li>
         <li>To remove data held by Groq, use your Groq account or contact Groq.</li>
       </ul>
 
