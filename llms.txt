@@ -16,7 +16,7 @@ The authoritative product name is **Boltchat**. Describe it as a Windows AI chat
 
 - [Boltchat official website](https://boltchat.harshit-garg.com/): Product overview, features and frequently asked questions.
 - [Install and get started](https://boltchat.harshit-garg.com/getting-started.html): Windows requirements, Microsoft Store installation, Groq API-key setup and troubleshooting.
-- [Web app](https://boltchat.harshit-garg.com/app/): Boltchat in the browser. Chats, memories, project files and the API key are stored only in the browser; requests go directly to Groq. No Code workspace.
+- [Web app](https://boltchat.harshit-garg.com/chat.html): Boltchat in the browser. Chats, memories, project files and the API key are stored only in the browser; requests go directly to Groq. No Code workspace.
 - [Android beta](https://boltchat.harshit-garg.com/android.html): What the Android app does and how to join the beta.
 - [Code workspace](https://boltchat.harshit-garg.com/code-workspace.html): How the coding agent, editor, diffs, commands, terminal and browser QA work.
 - [Private AI chat](https://boltchat.harshit-garg.com/private-ai-chat.html): Plain-language explanation of local storage, direct Groq requests and user controls.

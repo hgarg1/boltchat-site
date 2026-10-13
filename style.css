@@ -1457,3 +1457,33 @@ code { font: 0.9em "Cascadia Code", Consolas, monospace; padding: 1px 6px; borde
   .beta-info { grid-template-columns: 1fr; }
 }
 
+/* ---------- Chat page (chat.html): the web chat, framed like the app windows on the home page ---------- */
+.chat-hero { padding: 44px 0 22px; }
+.chat-hero h1 { font-size: clamp(1.8rem, 4vw, 2.6rem); }
+.chat-hero .updated { max-width: 640px; margin: 0 auto; color: var(--muted); }
+.chat-page { padding: 0 0 80px; }
+.chat-window {
+  height: clamp(520px, 100dvh - 150px, 900px);
+  border-radius: 20px;
+  border: 1px solid var(--border-strong);
+  background: var(--bg-solid);
+  box-shadow: var(--shadow), 0 0 80px -30px var(--glow);
+  overflow: hidden;
+}
+.chat-frame { display: block; width: 100%; height: 100%; border: 0; }
+.chat-under { margin: 12px 4px 0; text-align: right; font-size: 0.9em; }
+.chat-under a { color: var(--muted); text-decoration: none; }
+.chat-under a:hover { color: var(--accent); }
+.chat-facts { margin-top: 34px; }
+@media (max-width: 720px) {
+  .chat-hero { padding: 30px 0 16px; }
+  .chat-page .wrap { width: min(1120px, 100% - 16px); }
+  .chat-window { height: calc(100dvh - 96px); min-height: 460px; border-radius: 16px; }
+}
+
+/* The nav gained a link (Web app): keep every link on one line, and tighten them where the bar gets narrow */
+.nav a { white-space: nowrap; }
+@media (min-width: 861px) and (max-width: 1140px) {
+  .nav a { padding: 7px 9px; font-size: 0.88em; }
+  .nav-shell { gap: 8px; }
+}

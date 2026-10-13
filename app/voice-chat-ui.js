@@ -1,1 +1,900 @@
-(()=>{const d=window.VoiceChat;if(!d)return;const l=e=>document.getElementById(e),U={ttsModel:"canopylabs/orpheus-v1-english",voice:"autumn",llmModel:"",mode:"handsfree",interruptByVoice:!1,headphones:"auto",endOfSpeechMs:700,autoEndSec:120,fallbackTts:!0,captions:!0,filler:!0,speakCapChars:900},c=()=>({...U,...state.settings?.voiceChat||{}}),G=["openai/gpt-oss-20b"],K=["You are in a live voice conversation: your reply is read aloud.","Answer in short, natural spoken sentences, usually one to three, unless asked for more.","No markdown, lists, tables, headings or emoji. Never read code aloud; say you put it on screen.","Say numbers, dates, units and symbols the way a person would. Do not read out URLs.","For a big topic, give the headline, then ask if they want more.","If you were interrupted, do not repeat what they already heard; respond to what they said next."].join(" "),b={LISTENING:"Listening",USER_SPEAKING:"Listening",TRANSCRIBING:"Thinking",THINKING:"Thinking",SPEAKING:"Speaking",PAUSED:"Paused",IDLE:""},V={LISTENING:"Just talk. I'll answer when you pause.",USER_SPEAKING:"Go on, I'm listening.",TRANSCRIBING:"",THINKING:"Tap the orb or press Space to stop.",SPEAKING:"Tap the orb or press Space to interrupt.",PAUSED:"Audio paused."};let o=null;async function O(e){e.stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:!0,noiseSuppression:!0,autoGainControl:!1,channelCount:1}}),e.ctx=new AudioContext({sampleRate:16e3}),e.vad=new d.Vad({sampleRate:e.ctx.sampleRate,hangoverMs:c().endOfSpeechMs});const t=e.ctx.createMediaStreamSource(e.stream);try{await e.ctx.audioWorklet.addModule("voice-capture-worklet.js"),e.node=new AudioWorkletNode(e.ctx,"voice-capture"),e.node.port.onmessage=s=>T(e,s.data),t.connect(e.node)}catch{e.node=e.ctx.createScriptProcessor(2048,1,1);let s=[];e.node.onaudioprocess=a=>{const n=a.inputBuffer.getChannelData(0);for(let r=0;r<n.length;r++){const u=Math.max(-1,Math.min(1,n[r]));s.push(u<0?u*32768:u*32767),s.length===320&&(T(e,Int16Array.from(s)),s=[])}},t.connect(e.node),e.node.connect(e.ctx.destination)}}function k(e){try{e.node?.disconnect()}catch{}e.stream?.getTracks().forEach(t=>t.stop()),e.ctx?.close().catch(()=>{}),e.node=e.stream=null}function T(e,t){if(o!==e)return;const s=e.S.phase;if(e.micLevel=e.vad.level,!(e.muted||s==="IDLE"||s==="PAUSED")){if(c().mode==="push"){e.ptt?.on&&e.ptt.frames.push(t.slice());return}if(s==="SPEAKING"&&c().interruptByVoice)return B(e,t);if(s==="SPEAKING"){e.skipped=!0;return}if(e.skipped&&(e.vad.flush(),e.skipped=!1,e.deafUntil=performance.now()+300),!(performance.now()<(e.deafUntil||0)))for(const a of e.vad.push(t))a.type==="SPEECH_START"?i(e,{type:"SPEECH_START"}):a.type==="SPEECH_END"&&(a.tooShort||e.utterances.push({audio:a.audio,ms:a.audio.length/e.ctx.sampleRate*1e3}),i(e,{type:"SPEECH_END",tooShort:a.tooShort}))}}function B(e,t){const s=t.length/e.ctx.sampleRate*1e3,a=e.barge.push({micDb:d.frameDb(t),ttsDb:e.player.levelDb(),floorDb:e.vad.floor,ms:s});if(a==="tier1"?i(e,{type:"SPEECH_SUSTAINED",tier:1}):a==="tier2"&&i(e,{type:"SPEECH_SUSTAINED",tier:2}),!(e.S.phase!=="SPEAKING"&&e.S.phase!=="USER_SPEAKING"))for(const n of e.vad.push(t))n.type==="SPEECH_END"&&(e.S.phase==="SPEAKING"&&e.S.ducked&&!n.tooShort?(e.utterances.push({audio:n.audio,ms:n.audio.length/e.ctx.sampleRate*1e3}),i(e,{type:"SPEECH_END",tooShort:!1})):e.S.phase==="USER_SPEAKING"&&(n.tooShort||e.utterances.push({audio:n.audio,ms:n.audio.length/e.ctx.sampleRate*1e3}),i(e,{type:"SPEECH_END",tooShort:n.tooShort})))}async function H(){const e=c().headphones;if(e==="on")return!0;if(e==="off")return!1;try{const t=await navigator.mediaDevices.enumerateDevices(),s=t.find(a=>a.kind==="audiooutput"&&a.deviceId==="default")||t.find(a=>a.kind==="audiooutput");return/head(phone|set)|airpods|earbud|buds|earphone|bluetooth|hands-?free/i.test(s?.label||"")}catch{return!1}}class q{constructor(t){this.c=t,this.items=[],this.nextIndex=0,this.nextStart=0,this.fetching=0,this.synthBusy=!1,this.fallbackUntil=0,this.lastCut=null,this.sources=new Set,this.drainedSent=!0}get ctx(){return this._ctx||(this._ctx=new AudioContext,this.gain=this._ctx.createGain(),this.analyser=this._ctx.createAnalyser(),this.analyser.fftSize=512,this.gain.connect(this.analyser),this.analyser.connect(this._ctx.destination)),this._ctx}level(){if(!this.analyser||!this.sources.size)return 0;const t=new Uint8Array(this.analyser.fftSize);this.analyser.getByteTimeDomainData(t);let s=0;for(const a of t)s+=((a-128)/128)**2;return Math.min(1,Math.sqrt(s/t.length)*3)}levelDb(){if(!this.analyser||!this.sources.size)return-100;const t=new Float32Array(this.analyser.fftSize);this.analyser.getFloatTimeDomainData(t);let s=0;for(const a of t)s+=a*a;return 20*Math.log10(Math.max(Math.sqrt(s/t.length),1e-7))}duck(t){if(!this._ctx)return;const s=this._ctx.currentTime;this.gain.gain.cancelScheduledValues(s),this.gain.gain.setValueAtTime(this.gain.gain.value,s),this.gain.gain.linearRampToValueAtTime(t,s+.04)}add(t){const s={id:`tts-${o?.id}-${this.nextIndex}`,index:this.nextIndex++,text:t.text,rawStart:t.rawStart,rawEnd:t.rawEnd,status:"pending",played:!1};t.synth&&(s.status="synth"),this.items.push(s),this.drainedSent=!1,this.c.dispatchTtsQueued(),this.fetchMore()}useSynth(){return c().fallbackTts&&performance.now()<this.fallbackUntil}fetchMore(){for(const t of this.items)if(t.status==="pending"){if(this.fetching>=2)break;if(this.useSynth()){t.status="synth";continue}this.fetching++,t.status="fetching",this.fetchItem(t)}this.pump()}async fetchItem(t){const s=c();try{const a=await api.speak({id:t.id,text:t.text,voice:s.voice,model:s.ttsModel});if(t.status==="cancelled")return;if(!a.ok)throw Object.assign(new Error(a.message||"Speech failed"),{status:a.status,aborted:a.aborted,retryAfter:a.retryAfter});const n=a.bytes.buffer.slice(a.bytes.byteOffset,a.bytes.byteOffset+a.bytes.byteLength);t.buffer=await this.ctx.decodeAudioData(n),t.status="ready"}catch(a){if(t.status==="cancelled"||a.aborted)return;s.fallbackTts?(this.fallbackUntil=performance.now()+(a.status===429?Math.max(60,a.retryAfter||0)*1e3:6e4),t.status="synth",this.warned||(this.warned=!0,toast(a.status===429?"Groq speech is rate limited, using the system voice for a bit":`Speech unavailable (${a.message}), using the system voice`,{kind:"warn"}))):(t.status="failed",toast(`Speech failed: ${a.message}`,{kind:"error"}))}finally{this.fetching=Math.max(0,this.fetching-1),this.fetchMore()}}pump(){if(!this.synthBusy){for(const t of this.items)if(!(t.scheduled||t.status==="cancelled")){if(t.status==="failed"){t.scheduled=t.played=!0;continue}if(t.status==="ready")this.schedule(t);else if(t.status==="synth"){this.speakSynth(t);return}else break}this.checkDrained()}}schedule(t){const s=this.ctx;s.state==="suspended"&&s.resume();const a=s.createBufferSource();a.buffer=t.buffer,a.connect(this.gain);const n=Math.max(s.currentTime+.03,this.nextStart);a.start(n),t.scheduled=!0,t.start=n,t.end=n+t.buffer.duration,this.nextStart=t.end,this.sources.add(a),a.onended=()=>{this.sources.delete(a),t.played=!0,this.checkDrained()}}speakSynth(t){t.scheduled=!0,this.synthBusy=!0;const s=Math.max(0,(this.nextStart-(this._ctx?this._ctx.currentTime:0))*1e3);t.synthStarted=performance.now()+s,t.timer=setTimeout(()=>{const a=new SpeechSynthesisUtterance(t.text),n=()=>{this.synthBusy=!1,t.played=!0,this.nextStart=this._ctx?this._ctx.currentTime:0,this.pump()};a.onend=n,a.onerror=n,t.utterance=a,speechSynthesis.speak(a)},s)}checkDrained(){this.drainedSent||this.items.every(t=>t.played||t.status==="cancelled")&&this.fetching===0&&!this.synthBusy&&(this.drainedSent=!0,this.c.dispatchDrained())}position(){const t=this._ctx;if(!t)return null;const s=t.currentTime-(t.outputLatency||0);for(const n of this.items){if(n.start==null||n.played)continue;const r=u=>({index:n.index,rawStart:n.rawStart,rawEnd:n.rawEnd,fraction:u});if(s>=n.start&&s<n.end)return r((s-n.start)/(n.end-n.start));if(s<n.start)return r(0)}const a=[...this.items].reverse().find(n=>n.played);return a?{index:a.index,rawStart:a.rawStart,rawEnd:a.rawEnd,fraction:1}:null}allSpoken(){return this.items.length>0&&this.items.every(t=>t.played)}cut(){this.lastCut=this.allSpoken()?null:this.position();for(const t of this.items)t.played||(t.status="cancelled"),clearTimeout(t.timer);try{speechSynthesis.cancel()}catch{}if(api.speakCancel(),this.synthBusy=!1,this._ctx&&this.sources.size){const t=this._ctx.currentTime;this.gain.gain.cancelScheduledValues(t),this.gain.gain.setValueAtTime(this.gain.gain.value,t),this.gain.gain.linearRampToValueAtTime(0,t+.07);const s=[...this.sources];setTimeout(()=>{s.forEach(a=>{try{a.stop()}catch{}}),this.gain&&(this.gain.gain.value=1)},90),this.sources.clear()}this.fetching=0,this.nextStart=0,this.drainedSent=!0}clear(){this.items=this.items.filter(t=>t.played)}close(){this.cut(),this._ctx?.close().catch(()=>{})}}let F=1;function i(e,t){if(o===e&&(e.queue.push(t),!e.running)){e.running=!0;try{for(;e.queue.length;){const s=e.queue.shift(),a=e.S.phase,n=d.reduce(e.S,s);e.S=n.state,a==="SPEAKING"&&e.S.phase!=="SPEAKING"&&e.S.phase!=="USER_SPEAKING"&&(e.vad?.flush(),e.barge?.reset(),e.deafUntil=performance.now()+300),e.S.phase==="SPEAKING"&&a!=="SPEAKING"&&e.barge?.reset(),e.S.phase!=="LISTENING"&&(e.lastActivity=performance.now());for(const r of n.effects)j(e,r);x(e)}}finally{e.running=!1}}}function $(e){return e.reply?.msg?.content||""}function I(e,t){for(const s of t){if(e.capped)return;e.chunks.push(s),e.spokenTotal+=s.text.length,e.player.add(s),e.spokenTotal>=c().speakCapChars&&e.S.phase!=="IDLE"&&(e.capped=!0,e.player.add({text:"I can keep going. Just say continue.",rawStart:s.rawEnd,rawEnd:s.rawEnd}))}}function W(e,t){const s=t.text;e.chunker=new d.SpeechChunker,e.chunks=[],e.spokenTotal=0,e.capped=!1,e.player.lastCut=null,e.player.items=[],e.player.nextIndex=0,e.replyEpoch=t.epoch,e.captionUser=s;const a=activeChat(),n=e.lastTurn;if(e.mergeFold&&n&&a&&a.id===n.chatId&&s.startsWith(n.text)){const p=conversationHistory.node(a,n.userNodeId);p?(p.content=s,startAssistantReply(a,{replyToNodeId:n.userNodeId})):sendMessage(s,[],e.tool)}else sendMessage(s,[],e.tool);e.mergeFold=!1;const r=state.streaming,u=activeChat();r&&(e.reply={requestId:r.requestId,msg:r.msg,chat:u},e.lastTurn={chatId:u.id,userNodeId:u.messages[r.index-1]?.nodeId,text:s})}function j(e,t){switch(t.type){case"START_MIC":break;case"STOP_MIC":k(e);break;case"MIC_MUTE":e.muted=!0,e.stream?.getAudioTracks().forEach(s=>{s.enabled=!1});break;case"MIC_UNMUTE":e.muted=!1,e.stream?.getAudioTracks().forEach(s=>{s.enabled=!0});break;case"DISCARD_UTTERANCE":e.vad?.flush();break;case"SEND_STT":Y(e,t);break;case"START_LLM":W(e,t);break;case"ABORT_LLM":e.reply&&state.streaming?.requestId===e.reply.requestId&&stopStreaming(),e.reply=e.reply?{...e.reply,aborted:!0}:null;break;case"DROP_REPLY":e.mergeFold=!0;break;case"CUT_AUDIO":e.player.cut();break;case"CLEAR_TTS":e.player.clear();break;case"COMMIT_SPOKEN":z(e);break;case"PLAY_FILLER":c().filler&&e.player.add({text:"Let me look that up.",rawStart:0,rawEnd:0,filler:!0});break;case"SHOW_NOTICE":toast(t.text,{kind:"warn"});break;case"SPEAK_ERROR":try{speechSynthesis.speak(new SpeechSynthesisUtterance("Sorry, something went wrong."))}catch{}break;case"PAUSE_ALL":e.player._ctx?.suspend();break;case"RESUME_ALL":e.player._ctx?.resume();break;case"END_CALL":w(e);break;case"DUCK":e.player.duck(t.gain);break;case"UNDUCK":e.player.duck(1),t.reason==="echo"&&(e.barge.falseBarge(),e.falseBarges=(e.falseBarges||0)+1,e.falseBarges===2&&!e.headphones&&toast("The mic keeps hearing the speakers. Headphones work best for interrupting by voice.",{kind:"info"}));break;default:break}}function z(e){const t=e.reply?.msg;if(!t||!e.player.lastCut)return;const s=t.content||"",a=e.player.lastCut,n=d.spokenChars(s,[{rawStart:a.rawStart,rawEnd:a.rawEnd}],0,a.fraction);n<s.length&&(t.spokenChars=n,t.interrupted=!0,persistChats()),e.player.lastCut=null}async function Y(e,t){const s=e.utterances.shift();if(!s)return i(e,{type:"STT_EMPTY",epoch:t.epoch,purpose:t.purpose});e.sttMs+=Math.max(1e4,s.ms);try{const a=d.encodeWav(s.audio,e.ctx?.sampleRate||16e3),n=await api.transcribeVerbose(a,"audio/wav");if(o!==e)return;if(!n.text||d.isHallucination(n,s.ms))return i(e,{type:"STT_EMPTY",epoch:t.epoch,purpose:t.purpose});e.captionUser=n.text,i(e,{type:"STT_OK",text:n.text,epoch:t.epoch,purpose:t.purpose,spokenTail:e.chunks.slice(-3).map(r=>r.text).join(" ")})}catch(a){o===e&&i(e,{type:"STT_ERR",epoch:t.epoch,purpose:t.purpose,message:cleanError(a)})}}function Q(e,t){const s=o;!s||s.reply?.requestId!==e||s.reply.aborted||(I(s,s.chunker.push(t.content||"")),s.captionModel=answerText(t.content||""))}function J(e){const t=o;!t||t.reply?.requestId!==e||t.reply.aborted||i(t,{type:"LLM_TOOL",epoch:t.replyEpoch})}function X(e,t){const s=o;!s||s.reply?.requestId!==e||s.reply.aborted||t!=="stopped"&&(I(s,s.chunker.push(s.reply.msg.content||"",!0)),s.captionModel=answerText(s.reply.msg.content||""),i(s,{type:"LLM_DONE",epoch:s.replyEpoch}))}function Z(e,t){const s=o;!s||s.reply?.requestId!==e||s.reply.aborted||i(s,{type:"LLM_ERR",epoch:s.replyEpoch,message:t})}const m=()=>l("voice-overlay");function x(e){const t=m();if(!t||o!==e)return;const s=e.S.phase;for(const n of Object.keys(b))t.classList.toggle(`is-${n.toLowerCase()}`,s===n);t.classList.toggle("is-muted",e.muted),l("voice-state").textContent=e.muted&&(s==="LISTENING"||s==="USER_SPEAKING")?"Muted":b[s],l("voice-hint").textContent=e.muted?"Mic is muted.":V[s]||"",l("voice-mute").setAttribute("aria-pressed",String(e.muted)),l("voice-mute").textContent=e.muted?"Unmute":"Mute",l("voice-interrupt").disabled=s!=="THINKING"&&s!=="SPEAKING",l("voice-web").setAttribute("aria-pressed",String(e.tool==="web")),l("voice-code").setAttribute("aria-pressed",String(e.tool==="code"));const a=c().captions;t.classList.toggle("no-captions",!a),l("cap-user").textContent=e.captionUser||"",A(e)}function A(e){const t=l("cap-model"),s=e.captionModel||"",a=e.S.phase==="SPEAKING"?Math.min(e.captionHeard||0,s.length):0,n=s.length+":"+a+":"+(e.S.phase==="SPEAKING");if(e.captionKey===n)return;if(e.captionKey=n,t.textContent="",!a||a>=s.length){t.textContent=s;return}const r=document.createElement("span");r.textContent=s.slice(0,a);const u=document.createElement("span");u.className="cap-rest",u.textContent=s.slice(a),t.append(r,u)}function N(e){if(o!==e)return;const t=e.S.phase;let s=0;t==="SPEAKING"?s=e.player.level():(t==="LISTENING"||t==="USER_SPEAKING")&&(s=e.muted?0:Math.max(0,Math.min(1,(e.micLevel+60)/45))),e.smooth=(e.smooth||0)*.7+s*.3;const a=performance.now();if(t==="SPEAKING"&&a-(e.capAt||0)>120){e.capAt=a;const r=e.player.position(),u=$(e);if(r&&u){const p=d.spokenChars(u,[{rawStart:r.rawStart,rawEnd:r.rawEnd}],0,r.fraction),v=answerText(u.slice(0,p));answerText(u).startsWith(v)&&(e.captionHeard=v.length,A(e))}}const n=m();n&&n.style.setProperty("--level",e.smooth.toFixed(3)),e.raf=requestAnimationFrame(()=>N(e))}async function C(){if(o)return;if(!state.settings?.hasKey){toast("Add your Groq API key in Settings first",{kind:"warn"});return}if(!window.AudioContext||!navigator.mediaDevices?.getUserMedia){toast("Voice chat needs microphone access, which this window does not have",{kind:"error"});return}state.streaming&&stopStreaming();const e={id:F++,S:d.initialState({interruptByVoice:c().interruptByVoice}),queue:[],running:!1,muted:!1,utterances:[],chunks:[],spokenTotal:0,sttMs:0,startedAt:Date.now(),lastActivity:performance.now(),tool:null,captionUser:"",captionModel:"",micLevel:-100};e.player=new q(e),e.barge=new d.BargeInDetector({}),e.dispatchTtsQueued=()=>i(e,{type:"TTS_STARTED",epoch:e.replyEpoch}),e.dispatchDrained=()=>i(e,{type:"PLAY_DRAINED",epoch:e.replyEpoch}),o=e,state.voiceCall=e,document.body.classList.add("voice-active"),m().hidden=!1,l("voice-model").textContent=E(null)?state.models.find(t=>t.id===E(null))?.name||E(null):"";try{await O(e)}catch(t){toast(t?.name==="NotAllowedError"?"Microphone access was blocked":`Could not start the microphone: ${cleanError(t)}`,{kind:"error"}),w(e);return}e.headphones=await H(),e.barge.headphones=e.headphones,e.player.ctx,i(e,{type:"START"}),N(e),e.silenceTimer=setInterval(()=>{const t=c().autoEndSec*1e3;t&&e.S.phase==="LISTENING"&&performance.now()-e.lastActivity>t&&(toast("Voice chat ended after a long silence",{kind:"info"}),i(e,{type:"SILENCE_TIMEOUT"}))},1e3),m().focus()}function w(e){if(o!==e)return;clearInterval(e.silenceTimer),cancelAnimationFrame(e.raf),k(e),e.player.close(),o=null,state.voiceCall=null,document.body.classList.remove("voice-active");const t=m();t.hidden=!0,t.className="voice-overlay";const s=Math.max(1,Math.round((Date.now()-e.startedAt)/6e4));if(e.sttMs>0){const a=e.sttMs/36e5*.04+e.spokenTotal/1e6*22;el.hint.textContent=`Voice chat: ${s} min, about $${a<.01?"0.01":a.toFixed(2)} of Groq speech`}updateComposerState(),el.prompt.focus()}function S(){o&&i(o,{type:"END"})}function M(){const e=o;!e||e.ptt?.on||e.muted||((e.S.phase==="THINKING"||e.S.phase==="SPEAKING")&&i(e,{type:"TAP_INTERRUPT"}),e.ptt={on:!0,frames:[]},i(e,{type:"SPEECH_START"}))}function L(){const e=o;if(!e||!e.ptt?.on)return;const t=e.ptt.frames;e.ptt=null;const s=t.reduce((p,v)=>p+v.length,0),a=new Int16Array(s);let n=0;for(const p of t)a.set(p,n),n+=p.length;const r=s/(e.ctx?.sampleRate||16e3)*1e3,u=r<250;u||e.utterances.push({audio:a,ms:r}),i(e,{type:"SPEECH_END",tooShort:u})}function y(){o&&i(o,{type:"TAP_INTERRUPT"})}function _(){o&&i(o,{type:o.muted?"UNMUTE":"MUTE"})}function D(e){o&&(o.tool=o.tool===e?null:e,x(o))}function E(e){const t=(state.models||[]).map(n=>n.id),s=c().llmModel;let a=t.includes(s)?s:G.find(n=>t.includes(n))||state.settings.model;return e&&!supportsTools(a)&&(a=TOOL_MODEL),a}window.VoiceUI={start:C,end:S,interrupt:y,toggle:()=>o?S():C(),isActive:()=>!!o,modelFor:E,systemNote:()=>K,onDelta:Q,onTool:J,onDone:X,onError:Z},l("voice-chat-btn")?.addEventListener("click",()=>window.VoiceUI.toggle()),l("voice-orb").addEventListener("click",()=>{c().mode!=="push"&&y()}),l("voice-orb").addEventListener("pointerdown",()=>{c().mode==="push"&&M()}),addEventListener("pointerup",()=>{c().mode==="push"&&L()}),l("voice-interrupt").addEventListener("click",y),l("voice-mute").addEventListener("click",_),l("voice-end").addEventListener("click",S),l("voice-web").addEventListener("click",()=>D("web")),l("voice-code").addEventListener("click",()=>D("code")),document.addEventListener("keydown",e=>{if(e.ctrlKey&&e.shiftKey&&e.key.toLowerCase()==="v"){e.preventDefault(),window.VoiceUI.toggle();return}if(!o)return;const t=/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement?.tagName||"");e.key==="Escape"?(e.preventDefault(),e.stopPropagation(),o.S.phase==="THINKING"||o.S.phase==="SPEAKING"?y():S()):(e.key===" "||e.code==="Space")&&!t?(e.preventDefault(),e.stopPropagation(),c().mode==="push"?e.repeat||M():y()):e.key.toLowerCase()==="m"&&!t&&!e.ctrlKey&&!e.altKey&&(e.preventDefault(),_())},!0),document.addEventListener("keyup",e=>{o&&(e.key===" "||e.code==="Space")&&c().mode==="push"&&(e.preventDefault(),L())},!0),addEventListener("beforeunload",()=>{o&&w(o)});const h={},P=e=>saveSetting({voiceChat:{...c(),...e}});function f(e,t,s,a=n=>n){const n=createDropdown({options:s,onChange:r=>P({[t]:a(r)})});l(e).appendChild(n.el),h[t]=n}function g(e,t){l(e).addEventListener("click",()=>P({[t]:!c()[t]}).then(R))}function ee(){if(h.voice)return;f("vc-voice-dropdown","voice",[["autumn","Autumn","Warm, female"],["diana","Diana","Clear, female"],["hannah","Hannah","Bright, female"],["austin","Austin","Relaxed, male"],["daniel","Daniel","Steady, male"],["troy","Troy","Deep, male"]].map(([t,s,a])=>({value:t,label:s,description:a}))),f("vc-llm-dropdown","llmModel",[{value:"",label:"Automatic",description:"The fastest model that answers without a reasoning phase"}]),f("vc-mode-dropdown","mode",[{value:"handsfree",label:"Hands-free",description:"Boltchat listens for you to speak and pause"},{value:"push",label:"Push to talk",description:"Hold Space or the orb while you speak"}]),f("vc-headphones-dropdown","headphones",[{value:"auto",label:"Automatic"},{value:"on",label:"I am wearing headphones"},{value:"off",label:"I am using speakers"}]),f("vc-pause-dropdown","endOfSpeechMs",[{value:"500",label:"Quick",hint:"0.5 s"},{value:"700",label:"Normal",hint:"0.7 s"},{value:"1000",label:"Patient",hint:"1 s"}],Number),f("vc-cap-dropdown","speakCapChars",[{value:"500",label:"Short",hint:"about half a minute"},{value:"900",label:"Normal",hint:"about a minute"},{value:"2000",label:"Long",hint:"about two minutes"},{value:"5000",label:"No limit"}],Number),f("vc-autoend-dropdown","autoEndSec",[{value:"60",label:"1 minute"},{value:"120",label:"2 minutes"},{value:"300",label:"5 minutes"},{value:"0",label:"Never"}],Number),g("vc-interrupt-switch","interruptByVoice"),g("vc-captions-switch","captions"),g("vc-filler-switch","filler"),g("vc-fallback-switch","fallbackTts")}function R(){const e=c();h.voice.setValue(e.voice),h.mode.setValue(e.mode),h.headphones.setValue(e.headphones||"auto"),h.endOfSpeechMs.setValue(String(e.endOfSpeechMs)),h.speakCapChars.setValue(String(e.speakCapChars)),h.autoEndSec.setValue(String(e.autoEndSec));for(const[s,a]of[["vc-interrupt-switch","interruptByVoice"],["vc-captions-switch","captions"],["vc-filler-switch","filler"],["vc-fallback-switch","fallbackTts"]])l(s).setAttribute("aria-checked",String(!!e[a]));const t=[{value:"",label:"Automatic",description:"The fastest model that answers without a reasoning phase"}].concat((state.models||[]).map(s=>({value:s.id,label:s.name||s.id})));h.llmModel.setOptions&&h.llmModel.setOptions(t),h.llmModel.setValue(e.llmModel||"")}window.renderVoiceChatSettings=()=>{ee(),R()}})();
+// Voice chat on the desktop: the runtime around the pure core in voice-chat.js. It owns the microphone
+// (AudioWorklet), the speaker (WebAudio, one Groq Orpheus WAV per chunk), the overlay, and the glue to
+// the chat engine in renderer.js. A plain script that shares globals with renderer.js and loads after it.
+(() => {
+  const VC = window.VoiceChat;
+  if (!VC) return;
+  const $ = id => document.getElementById(id);
+
+  const DEFAULTS = {
+    ttsModel: 'canopylabs/orpheus-v1-english', voice: 'autumn', llmModel: '', mode: 'handsfree', interruptByVoice: false, headphones: 'auto',
+    endOfSpeechMs: 700, autoEndSec: 120, fallbackTts: true, captions: true, filler: true, speakCapChars: 900
+  };
+  const settings = () => ({ ...DEFAULTS, ...(state.settings?.voiceChat || {}) });
+
+  // Groq models for a voice turn, in order of preference (Groq retired its fast non-reasoning Llama models in
+  // August 2026; a call leaves the reasoning level to Groq, see ignoreEffort in main.js)
+  const VOICE_MODEL_PREFERENCE = ['openai/gpt-oss-20b'];
+
+  const VOICE_NOTE = [
+    'You are in a live voice conversation: your reply is read aloud.',
+    'Answer in short, natural spoken sentences, usually one to three, unless asked for more.',
+    'No markdown, lists, tables, headings or emoji. Never read code aloud; say you put it on screen.',
+    'Say numbers, dates, units and symbols the way a person would. Do not read out URLs.',
+    'For a big topic, give the headline, then ask if they want more.',
+    'If you were interrupted, do not repeat what they already heard; respond to what they said next.'
+  ].join(' ');
+
+  const LABELS = {
+    LISTENING: 'Listening', USER_SPEAKING: 'Listening', TRANSCRIBING: 'Thinking', THINKING: 'Thinking', SPEAKING: 'Speaking', PAUSED: 'Paused', IDLE: ''
+  };
+  const HINTS = {
+    LISTENING: 'Just talk. I\'ll answer when you pause.',
+    USER_SPEAKING: 'Go on, I\'m listening.',
+    TRANSCRIBING: '',
+    THINKING: 'Tap the orb or press Space to stop.',
+    SPEAKING: 'Tap the orb or press Space to interrupt.',
+    PAUSED: 'Audio paused.'
+  };
+
+  let call = null;
+
+  // ---------- Microphone ----------
+
+  async function startCapture(c) {
+    c.stream = await navigator.mediaDevices.getUserMedia({
+      audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: false, channelCount: 1 }
+    });
+    c.ctx = new AudioContext({ sampleRate: 16000 });
+    c.vad = new VC.Vad({ sampleRate: c.ctx.sampleRate, hangoverMs: settings().endOfSpeechMs });
+    const source = c.ctx.createMediaStreamSource(c.stream);
+    try {
+      await c.ctx.audioWorklet.addModule('voice-capture-worklet.js');
+      c.node = new AudioWorkletNode(c.ctx, 'voice-capture');
+      c.node.port.onmessage = e => onFrame(c, e.data);
+      source.connect(c.node);
+    } catch {
+      // The worklet could not load (packaging or policy): fall back to the older main-thread processor
+      c.node = c.ctx.createScriptProcessor(2048, 1, 1);
+      let carry = [];
+      c.node.onaudioprocess = e => {
+        const input = e.inputBuffer.getChannelData(0);
+        for (let i = 0; i < input.length; i++) {
+          const v = Math.max(-1, Math.min(1, input[i]));
+          carry.push(v < 0 ? v * 32768 : v * 32767);
+          if (carry.length === 320) {
+            onFrame(c, Int16Array.from(carry));
+            carry = [];
+          }
+        }
+      };
+      source.connect(c.node);
+      c.node.connect(c.ctx.destination);
+    }
+  }
+
+  function stopCapture(c) {
+    try { c.node?.disconnect(); } catch { /* already gone */ }
+    c.stream?.getTracks().forEach(t => t.stop());
+    c.ctx?.close().catch(() => {});
+    c.node = c.stream = null;
+  }
+
+  function onFrame(c, frame) {
+    if (call !== c) return;
+    const phase = c.S.phase;
+    c.micLevel = c.vad.level;
+    if (c.muted || phase === 'IDLE' || phase === 'PAUSED') return;
+    if (settings().mode === 'push') {
+      if (c.ptt?.on) c.ptt.frames.push(frame.slice());
+      return;
+    }
+    if (phase === 'SPEAKING' && settings().interruptByVoice) return onFrameWhileSpeaking(c, frame);
+    if (phase === 'SPEAKING') {
+      c.skipped = true; // the mic is not listened to while the model talks (it would hear itself)
+      return;
+    }
+    if (c.skipped) {
+      c.vad.flush();
+      c.skipped = false;
+      c.deafUntil = performance.now() + 300; // the speaker's tail still rings in the room
+    }
+    if (performance.now() < (c.deafUntil || 0)) return;
+    for (const ev of c.vad.push(frame)) {
+      if (ev.type === 'SPEECH_START') dispatch(c, { type: 'SPEECH_START' });
+      else if (ev.type === 'SPEECH_END') {
+        if (!ev.tooShort) c.utterances.push({ audio: ev.audio, ms: (ev.audio.length / c.ctx.sampleRate) * 1000 });
+        dispatch(c, { type: 'SPEECH_END', tooShort: ev.tooShort });
+      }
+    }
+  }
+
+  // Interrupt by speaking: watch for you talking over the model. Speech must stay above an echo-aware bar
+  // (VoiceChat.BargeInDetector): first the model ducks, then it is cut. The VAD keeps recording so the
+  // words can be transcribed and judged ("mm-hmm" and "stop" are not new questions).
+  function onFrameWhileSpeaking(c, frame) {
+    const ms = (frame.length / c.ctx.sampleRate) * 1000;
+    const tier = c.barge.push({ micDb: VC.frameDb(frame), ttsDb: c.player.levelDb(), floorDb: c.vad.floor, ms });
+    if (tier === 'tier1') dispatch(c, { type: 'SPEECH_SUSTAINED', tier: 1 });
+    else if (tier === 'tier2') dispatch(c, { type: 'SPEECH_SUSTAINED', tier: 2 });
+    if (c.S.phase !== 'SPEAKING' && c.S.phase !== 'USER_SPEAKING') return;
+    for (const ev of c.vad.push(frame)) {
+      if (ev.type !== 'SPEECH_END') continue;
+      if (c.S.phase === 'SPEAKING' && c.S.ducked && !ev.tooShort) {
+        c.utterances.push({ audio: ev.audio, ms: (ev.audio.length / c.ctx.sampleRate) * 1000 });
+        dispatch(c, { type: 'SPEECH_END', tooShort: false });
+      } else if (c.S.phase === 'USER_SPEAKING') {
+        if (!ev.tooShort) c.utterances.push({ audio: ev.audio, ms: (ev.audio.length / c.ctx.sampleRate) * 1000 });
+        dispatch(c, { type: 'SPEECH_END', tooShort: ev.tooShort });
+      }
+    }
+  }
+
+  // Are the speakers headphones? The default output device's name is the best hint the browser gives.
+  async function detectHeadphones() {
+    const setting = settings().headphones;
+    if (setting === 'on') return true;
+    if (setting === 'off') return false;
+    try {
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      const out = devices.find(d => d.kind === 'audiooutput' && d.deviceId === 'default') || devices.find(d => d.kind === 'audiooutput');
+      return /head(phone|set)|airpods|earbud|buds|earphone|bluetooth|hands-?free/i.test(out?.label || '');
+    } catch {
+      return false;
+    }
+  }
+
+  // ---------- Speaker ----------
+
+  class Player {
+    constructor(c) {
+      this.c = c;
+      this.items = [];
+      this.nextIndex = 0;
+      this.nextStart = 0;
+      this.fetching = 0;
+      this.synthBusy = false;
+      this.fallbackUntil = 0;
+      this.lastCut = null;
+      this.sources = new Set();
+      this.drainedSent = true;
+    }
+
+    get ctx() {
+      if (!this._ctx) {
+        this._ctx = new AudioContext();
+        this.gain = this._ctx.createGain();
+        this.analyser = this._ctx.createAnalyser();
+        this.analyser.fftSize = 512;
+        this.gain.connect(this.analyser);
+        this.analyser.connect(this._ctx.destination);
+      }
+      return this._ctx;
+    }
+
+    level() {
+      if (!this.analyser || !this.sources.size) return 0;
+      const buf = new Uint8Array(this.analyser.fftSize);
+      this.analyser.getByteTimeDomainData(buf);
+      let sum = 0;
+      for (const v of buf) sum += ((v - 128) / 128) ** 2;
+      return Math.min(1, Math.sqrt(sum / buf.length) * 3);
+    }
+
+    levelDb() {
+      if (!this.analyser || !this.sources.size) return -100;
+      const buf = new Float32Array(this.analyser.fftSize);
+      this.analyser.getFloatTimeDomainData(buf);
+      let sum = 0;
+      for (const v of buf) sum += v * v;
+      return 20 * Math.log10(Math.max(Math.sqrt(sum / buf.length), 1e-7));
+    }
+
+    // Quieter while you might be interrupting (a quick ramp, not a jump)
+    duck(gain) {
+      if (!this._ctx) return;
+      const now = this._ctx.currentTime;
+      this.gain.gain.cancelScheduledValues(now);
+      this.gain.gain.setValueAtTime(this.gain.gain.value, now);
+      this.gain.gain.linearRampToValueAtTime(gain, now + 0.04);
+    }
+
+    add(chunk) {
+      const item = { id: `tts-${call?.id}-${this.nextIndex}`, index: this.nextIndex++, text: chunk.text, rawStart: chunk.rawStart, rawEnd: chunk.rawEnd, status: 'pending', played: false };
+      if (chunk.synth) item.status = 'synth';
+      this.items.push(item);
+      this.drainedSent = false;
+      this.c.dispatchTtsQueued();
+      this.fetchMore();
+    }
+
+    useSynth() {
+      return settings().fallbackTts && performance.now() < this.fallbackUntil;
+    }
+
+    fetchMore() {
+      for (const item of this.items) {
+        if (item.status !== 'pending') continue;
+        if (this.fetching >= 2) break;
+        if (this.useSynth()) {
+          item.status = 'synth';
+          continue;
+        }
+        this.fetching++;
+        item.status = 'fetching';
+        this.fetchItem(item);
+      }
+      this.pump();
+    }
+
+    async fetchItem(item) {
+      const s = settings();
+      try {
+        const res = await api.speak({ id: item.id, text: item.text, voice: s.voice, model: s.ttsModel });
+        if (item.status === 'cancelled') return;
+        if (!res.ok) throw Object.assign(new Error(res.message || 'Speech failed'), { status: res.status, aborted: res.aborted, retryAfter: res.retryAfter });
+        const copy = res.bytes.buffer.slice(res.bytes.byteOffset, res.bytes.byteOffset + res.bytes.byteLength);
+        item.buffer = await this.ctx.decodeAudioData(copy);
+        item.status = 'ready';
+      } catch (err) {
+        if (item.status === 'cancelled' || err.aborted) return;
+        // Orpheus is a preview model with tight limits: fall back to the system voice for a minute
+        if (s.fallbackTts) {
+          this.fallbackUntil = performance.now() + (err.status === 429 ? Math.max(60, err.retryAfter || 0) * 1000 : 60000);
+          item.status = 'synth';
+          if (!this.warned) {
+            this.warned = true;
+            toast(err.status === 429 ? 'Groq speech is rate limited, using the system voice for a bit' : `Speech unavailable (${err.message}), using the system voice`, { kind: 'warn' });
+          }
+        } else {
+          item.status = 'failed';
+          toast(`Speech failed: ${err.message}`, { kind: 'error' });
+        }
+      } finally {
+        this.fetching = Math.max(0, this.fetching - 1);
+        this.fetchMore();
+      }
+    }
+
+    // Plays items strictly in order: WAV chunks are scheduled back to back on the audio clock so
+    // there is no gap; a system-voice chunk waits for the audio before it, then speaks
+    pump() {
+      if (this.synthBusy) return;
+      for (const item of this.items) {
+        if (item.scheduled || item.status === 'cancelled') continue;
+        if (item.status === 'failed') {
+          item.scheduled = item.played = true;
+          continue;
+        }
+        if (item.status === 'ready') this.schedule(item);
+        else if (item.status === 'synth') {
+          this.speakSynth(item);
+          return;
+        } else break; // pending or still fetching: wait, order matters
+      }
+      this.checkDrained();
+    }
+
+    schedule(item) {
+      const ctx = this.ctx;
+      if (ctx.state === 'suspended') ctx.resume();
+      const src = ctx.createBufferSource();
+      src.buffer = item.buffer;
+      src.connect(this.gain);
+      const start = Math.max(ctx.currentTime + 0.03, this.nextStart);
+      src.start(start);
+      item.scheduled = true;
+      item.start = start;
+      item.end = start + item.buffer.duration;
+      this.nextStart = item.end;
+      this.sources.add(src);
+      src.onended = () => {
+        this.sources.delete(src);
+        item.played = true;
+        this.checkDrained();
+      };
+    }
+
+    speakSynth(item) {
+      item.scheduled = true;
+      this.synthBusy = true;
+      const wait = Math.max(0, (this.nextStart - (this._ctx ? this._ctx.currentTime : 0)) * 1000);
+      item.synthStarted = performance.now() + wait;
+      item.timer = setTimeout(() => {
+        const u = new SpeechSynthesisUtterance(item.text);
+        const done = () => {
+          this.synthBusy = false;
+          item.played = true;
+          this.nextStart = this._ctx ? this._ctx.currentTime : 0;
+          this.pump();
+        };
+        u.onend = done;
+        u.onerror = done;
+        item.utterance = u;
+        speechSynthesis.speak(u);
+      }, wait);
+    }
+
+    checkDrained() {
+      if (this.drainedSent) return;
+      if (this.items.every(i => i.played || i.status === 'cancelled') && this.fetching === 0 && !this.synthBusy) {
+        this.drainedSent = true;
+        this.c.dispatchDrained();
+      }
+    }
+
+    // Where playback is right now, as { index, fraction } of the chunk being heard
+    position() {
+      const ctx = this._ctx;
+      if (!ctx) return null;
+      const t = ctx.currentTime - (ctx.outputLatency || 0);
+      for (const item of this.items) {
+        if (item.start == null || item.played) continue;
+        const at = fraction => ({ index: item.index, rawStart: item.rawStart, rawEnd: item.rawEnd, fraction });
+        if (t >= item.start && t < item.end) return at((t - item.start) / (item.end - item.start));
+        if (t < item.start) return at(0);
+      }
+      const last = [...this.items].reverse().find(i => i.played);
+      return last ? { index: last.index, rawStart: last.rawStart, rawEnd: last.rawEnd, fraction: 1 } : null;
+    }
+
+    allSpoken() {
+      return this.items.length > 0 && this.items.every(i => i.played);
+    }
+
+    // Stops speaking now: a quick fade, then silence. Remembers where it stopped.
+    cut() {
+      this.lastCut = this.allSpoken() ? null : this.position();
+      for (const item of this.items) {
+        if (!item.played) item.status = 'cancelled';
+        clearTimeout(item.timer);
+      }
+      try { speechSynthesis.cancel(); } catch { /* none */ }
+      api.speakCancel();
+      this.synthBusy = false;
+      if (this._ctx && this.sources.size) {
+        const now = this._ctx.currentTime;
+        this.gain.gain.cancelScheduledValues(now);
+        this.gain.gain.setValueAtTime(this.gain.gain.value, now);
+        this.gain.gain.linearRampToValueAtTime(0, now + 0.07);
+        const doomed = [...this.sources];
+        setTimeout(() => {
+          doomed.forEach(s => { try { s.stop(); } catch { /* ended */ } });
+          if (this.gain) this.gain.gain.value = 1;
+        }, 90);
+        this.sources.clear();
+      }
+      this.fetching = 0;
+      this.nextStart = 0;
+      this.drainedSent = true;
+    }
+
+    clear() {
+      this.items = this.items.filter(i => i.played);
+    }
+
+    close() {
+      this.cut();
+      this._ctx?.close().catch(() => {});
+    }
+  }
+
+  // ---------- The call ----------
+
+  let nextCallId = 1;
+  function dispatch(c, event) {
+    if (call !== c) return;
+    c.queue.push(event);
+    if (c.running) return;
+    c.running = true;
+    try {
+      while (c.queue.length) {
+        const ev = c.queue.shift();
+        const before = c.S.phase;
+        const result = VC.reduce(c.S, ev);
+        c.S = result.state;
+        if (before === 'SPEAKING' && c.S.phase !== 'SPEAKING' && c.S.phase !== 'USER_SPEAKING') {
+          c.vad?.flush();
+          c.barge?.reset();
+          c.deafUntil = performance.now() + 300;
+        }
+        if (c.S.phase === 'SPEAKING' && before !== 'SPEAKING') c.barge?.reset();
+        if (c.S.phase !== 'LISTENING') c.lastActivity = performance.now();
+        for (const effect of result.effects) run(c, effect);
+        render(c);
+      }
+    } finally {
+      c.running = false;
+    }
+  }
+
+  function rawReply(c) {
+    return c.reply?.msg?.content || '';
+  }
+
+  function addChunks(c, chunks) {
+    for (const chunk of chunks) {
+      if (c.capped) return;
+      c.chunks.push(chunk);
+      c.spokenTotal += chunk.text.length;
+      c.player.add(chunk);
+      if (c.spokenTotal >= settings().speakCapChars && c.S.phase !== 'IDLE') {
+        c.capped = true;
+        c.player.add({ text: 'I can keep going. Just say continue.', rawStart: chunk.rawEnd, rawEnd: chunk.rawEnd });
+      }
+    }
+  }
+
+  function startLlm(c, effect) {
+    const text = effect.text;
+    c.chunker = new VC.SpeechChunker();
+    c.chunks = [];
+    c.spokenTotal = 0;
+    c.capped = false;
+    c.player.lastCut = null;
+    c.player.items = [];
+    c.player.nextIndex = 0;
+    c.replyEpoch = effect.epoch;
+    c.captionUser = text;
+    const chat = activeChat();
+    const prev = c.lastTurn;
+    if (c.mergeFold && prev && chat && chat.id === prev.chatId && text.startsWith(prev.text)) {
+      // They spoke again before any answer: one question, not two
+      const node = conversationHistory.node(chat, prev.userNodeId);
+      if (node) {
+        node.content = text;
+        startAssistantReply(chat, { replyToNodeId: prev.userNodeId });
+      } else sendMessage(text, [], c.tool);
+    } else sendMessage(text, [], c.tool);
+    c.mergeFold = false;
+    const s = state.streaming;
+    const chatNow = activeChat();
+    if (!s) return;
+    c.reply = { requestId: s.requestId, msg: s.msg, chat: chatNow };
+    c.lastTurn = { chatId: chatNow.id, userNodeId: chatNow.messages[s.index - 1]?.nodeId, text };
+  }
+
+  function run(c, effect) {
+    switch (effect.type) {
+      case 'START_MIC':
+        break; // started before the first event
+      case 'STOP_MIC':
+        stopCapture(c);
+        break;
+      case 'MIC_MUTE':
+        c.muted = true;
+        c.stream?.getAudioTracks().forEach(t => { t.enabled = false; });
+        break;
+      case 'MIC_UNMUTE':
+        c.muted = false;
+        c.stream?.getAudioTracks().forEach(t => { t.enabled = true; });
+        break;
+      case 'DISCARD_UTTERANCE':
+        c.vad?.flush();
+        break;
+      case 'SEND_STT':
+        transcribeNext(c, effect);
+        break;
+      case 'START_LLM':
+        startLlm(c, effect);
+        break;
+      case 'ABORT_LLM':
+        if (c.reply && state.streaming?.requestId === c.reply.requestId) stopStreaming();
+        c.reply = c.reply ? { ...c.reply, aborted: true } : null;
+        break;
+      case 'DROP_REPLY':
+        c.mergeFold = true;
+        break;
+      case 'CUT_AUDIO':
+        c.player.cut();
+        break;
+      case 'CLEAR_TTS':
+        c.player.clear();
+        break;
+      case 'COMMIT_SPOKEN':
+        commitSpoken(c);
+        break;
+      case 'PLAY_FILLER':
+        if (settings().filler) c.player.add({ text: 'Let me look that up.', rawStart: 0, rawEnd: 0, filler: true });
+        break;
+      case 'SHOW_NOTICE':
+        toast(effect.text, { kind: 'warn' });
+        break;
+      case 'SPEAK_ERROR':
+        try { speechSynthesis.speak(new SpeechSynthesisUtterance('Sorry, something went wrong.')); } catch { /* no voice */ }
+        break;
+      case 'PAUSE_ALL':
+        c.player._ctx?.suspend();
+        break;
+      case 'RESUME_ALL':
+        c.player._ctx?.resume();
+        break;
+      case 'END_CALL':
+        finish(c);
+        break;
+      case 'DUCK':
+        c.player.duck(effect.gain);
+        break;
+      case 'UNDUCK':
+        c.player.duck(1);
+        // The model heard itself (or the mic did): be less touchy next time, and say how to avoid it
+        if (effect.reason === 'echo') {
+          c.barge.falseBarge();
+          c.falseBarges = (c.falseBarges || 0) + 1;
+          if (c.falseBarges === 2 && !c.headphones) toast('The mic keeps hearing the speakers. Headphones work best for interrupting by voice.', { kind: 'info' });
+        }
+        break;
+      default:
+        break; // PLAY_CUE, KEEP_BUFFER: nothing to do (the VAD keeps its buffer)
+    }
+  }
+
+  // The reply the user did not finish hearing keeps how far they got, so the model can be told
+  function commitSpoken(c) {
+    const msg = c.reply?.msg;
+    if (!msg || !c.player.lastCut) return;
+    const raw = msg.content || '';
+    const cut = c.player.lastCut;
+    const spoken = VC.spokenChars(raw, [{ rawStart: cut.rawStart, rawEnd: cut.rawEnd }], 0, cut.fraction);
+    if (spoken < raw.length) {
+      msg.spokenChars = spoken;
+      msg.interrupted = true;
+      persistChats();
+    }
+    c.player.lastCut = null;
+  }
+
+  async function transcribeNext(c, effect) {
+    const utter = c.utterances.shift();
+    if (!utter) return dispatch(c, { type: 'STT_EMPTY', epoch: effect.epoch, purpose: effect.purpose });
+    c.sttMs += Math.max(10000, utter.ms); // Groq bills at least 10 seconds per request
+    try {
+      const wav = VC.encodeWav(utter.audio, c.ctx?.sampleRate || 16000);
+      const result = await api.transcribeVerbose(wav, 'audio/wav');
+      if (call !== c) return;
+      if (!result.text || VC.isHallucination(result, utter.ms)) return dispatch(c, { type: 'STT_EMPTY', epoch: effect.epoch, purpose: effect.purpose });
+      c.captionUser = result.text;
+      dispatch(c, { type: 'STT_OK', text: result.text, epoch: effect.epoch, purpose: effect.purpose, spokenTail: c.chunks.slice(-3).map(x => x.text).join(' ') });
+    } catch (err) {
+      if (call === c) dispatch(c, { type: 'STT_ERR', epoch: effect.epoch, purpose: effect.purpose, message: cleanError(err) });
+    }
+  }
+
+  // ---------- Events from the chat engine ----------
+
+  function onDelta(requestId, msg) {
+    const c = call;
+    if (!c || c.reply?.requestId !== requestId || c.reply.aborted) return;
+    addChunks(c, c.chunker.push(msg.content || ''));
+    c.captionModel = answerText(msg.content || '');
+  }
+
+  function onTool(requestId) {
+    const c = call;
+    if (!c || c.reply?.requestId !== requestId || c.reply.aborted) return;
+    dispatch(c, { type: 'LLM_TOOL', epoch: c.replyEpoch });
+  }
+
+  function onDone(requestId, finishReason) {
+    const c = call;
+    if (!c || c.reply?.requestId !== requestId || c.reply.aborted) return;
+    if (finishReason === 'stopped') return;
+    addChunks(c, c.chunker.push(c.reply.msg.content || '', true));
+    c.captionModel = answerText(c.reply.msg.content || '');
+    dispatch(c, { type: 'LLM_DONE', epoch: c.replyEpoch });
+  }
+
+  function onError(requestId, message) {
+    const c = call;
+    if (!c || c.reply?.requestId !== requestId || c.reply.aborted) return;
+    dispatch(c, { type: 'LLM_ERR', epoch: c.replyEpoch, message });
+  }
+
+  // ---------- Overlay ----------
+
+  const overlay = () => $('voice-overlay');
+
+  function render(c) {
+    const o = overlay();
+    if (!o || call !== c) return;
+    const phase = c.S.phase;
+    for (const name of Object.keys(LABELS)) o.classList.toggle(`is-${name.toLowerCase()}`, phase === name);
+    o.classList.toggle('is-muted', c.muted);
+    $('voice-state').textContent = c.muted && (phase === 'LISTENING' || phase === 'USER_SPEAKING') ? 'Muted' : LABELS[phase];
+    $('voice-hint').textContent = c.muted ? 'Mic is muted.' : HINTS[phase] || '';
+    $('voice-mute').setAttribute('aria-pressed', String(c.muted));
+    $('voice-mute').textContent = c.muted ? 'Unmute' : 'Mute';
+    $('voice-interrupt').disabled = phase !== 'THINKING' && phase !== 'SPEAKING';
+    $('voice-web').setAttribute('aria-pressed', String(c.tool === 'web'));
+    $('voice-code').setAttribute('aria-pressed', String(c.tool === 'code'));
+    const captions = settings().captions;
+    o.classList.toggle('no-captions', !captions);
+    $('cap-user').textContent = c.captionUser || '';
+    setModelCaption(c);
+  }
+
+  // The model's words, with what has been spoken so far in full strength and the rest dimmed
+  function setModelCaption(c) {
+    const box = $('cap-model');
+    const text = c.captionModel || '';
+    const heard = c.S.phase === 'SPEAKING' ? Math.min(c.captionHeard || 0, text.length) : 0;
+    const key = text.length + ':' + heard + ':' + (c.S.phase === 'SPEAKING');
+    if (c.captionKey === key) return;
+    c.captionKey = key;
+    box.textContent = '';
+    if (!heard || heard >= text.length) {
+      box.textContent = text;
+      return;
+    }
+    const a = document.createElement('span');
+    a.textContent = text.slice(0, heard);
+    const b = document.createElement('span');
+    b.className = 'cap-rest';
+    b.textContent = text.slice(heard);
+    box.append(a, b);
+  }
+
+  function animate(c) {
+    if (call !== c) return;
+    const phase = c.S.phase;
+    let level = 0;
+    if (phase === 'SPEAKING') level = c.player.level();
+    else if (phase === 'LISTENING' || phase === 'USER_SPEAKING') level = c.muted ? 0 : Math.max(0, Math.min(1, (c.micLevel + 60) / 45));
+    c.smooth = (c.smooth || 0) * 0.7 + level * 0.3;
+    const now = performance.now();
+    if (phase === 'SPEAKING' && now - (c.capAt || 0) > 120) {
+      c.capAt = now;
+      const pos = c.player.position();
+      const raw = rawReply(c);
+      if (pos && raw) {
+        const spokenRaw = VC.spokenChars(raw, [{ rawStart: pos.rawStart, rawEnd: pos.rawEnd }], 0, pos.fraction);
+        const heard = answerText(raw.slice(0, spokenRaw));
+        if (answerText(raw).startsWith(heard)) {
+          c.captionHeard = heard.length;
+          setModelCaption(c);
+        }
+      }
+    }
+    const o = overlay();
+    if (o) o.style.setProperty('--level', c.smooth.toFixed(3));
+    c.raf = requestAnimationFrame(() => animate(c));
+  }
+
+  // ---------- Start and end ----------
+
+  async function start() {
+    if (call) return;
+    if (!state.settings?.hasKey) {
+      toast('Add your Groq API key in Settings first', { kind: 'warn' });
+      return;
+    }
+    if (!window.AudioContext || !navigator.mediaDevices?.getUserMedia) {
+      toast('Voice chat needs microphone access, which this window does not have', { kind: 'error' });
+      return;
+    }
+    if (state.streaming) stopStreaming();
+    const c = {
+      id: nextCallId++, S: VC.initialState({ interruptByVoice: settings().interruptByVoice }), queue: [], running: false, muted: false,
+      utterances: [], chunks: [], spokenTotal: 0, sttMs: 0, startedAt: Date.now(), lastActivity: performance.now(), tool: null,
+      captionUser: '', captionModel: '', micLevel: -100
+    };
+    c.player = new Player(c);
+    c.barge = new VC.BargeInDetector({});
+    c.dispatchTtsQueued = () => dispatch(c, { type: 'TTS_STARTED', epoch: c.replyEpoch });
+    c.dispatchDrained = () => dispatch(c, { type: 'PLAY_DRAINED', epoch: c.replyEpoch });
+    call = c;
+    state.voiceCall = c;
+    document.body.classList.add('voice-active');
+    overlay().hidden = false;
+    $('voice-model').textContent = modelFor(null) ? (state.models.find(m => m.id === modelFor(null))?.name || modelFor(null)) : '';
+    try {
+      await startCapture(c);
+    } catch (err) {
+      toast(err?.name === 'NotAllowedError' ? 'Microphone access was blocked' : `Could not start the microphone: ${cleanError(err)}`, { kind: 'error' });
+      finish(c);
+      return;
+    }
+    c.headphones = await detectHeadphones();
+    c.barge.headphones = c.headphones;
+    c.player.ctx; // create the output context inside this user gesture so it may play
+    dispatch(c, { type: 'START' });
+    animate(c);
+    c.silenceTimer = setInterval(() => {
+      const limit = settings().autoEndSec * 1000;
+      if (limit && c.S.phase === 'LISTENING' && performance.now() - c.lastActivity > limit) {
+        toast('Voice chat ended after a long silence', { kind: 'info' });
+        dispatch(c, { type: 'SILENCE_TIMEOUT' });
+      }
+    }, 1000);
+    overlay().focus();
+  }
+
+  function finish(c) {
+    if (call !== c) return;
+    clearInterval(c.silenceTimer);
+    cancelAnimationFrame(c.raf);
+    stopCapture(c);
+    c.player.close();
+    call = null;
+    state.voiceCall = null;
+    document.body.classList.remove('voice-active');
+    const o = overlay();
+    o.hidden = true;
+    o.className = 'voice-overlay';
+    const minutes = Math.max(1, Math.round((Date.now() - c.startedAt) / 60000));
+    if (c.sttMs > 0) {
+      const cost = (c.sttMs / 3600000) * 0.04 + (c.spokenTotal / 1e6) * 22;
+      el.hint.textContent = `Voice chat: ${minutes} min, about $${cost < 0.01 ? '0.01' : cost.toFixed(2)} of Groq speech`;
+    }
+    updateComposerState();
+    el.prompt.focus();
+  }
+
+  function end() {
+    if (call) dispatch(call, { type: 'END' });
+  }
+
+  // Push to talk: hold Space (or the orb) to speak; letting go sends it. Starting to talk cuts the model off.
+  function pttStart() {
+    const c = call;
+    if (!c || c.ptt?.on || c.muted) return;
+    if (c.S.phase === 'THINKING' || c.S.phase === 'SPEAKING') dispatch(c, { type: 'TAP_INTERRUPT' });
+    c.ptt = { on: true, frames: [] };
+    dispatch(c, { type: 'SPEECH_START' });
+  }
+
+  function pttEnd() {
+    const c = call;
+    if (!c || !c.ptt?.on) return;
+    const frames = c.ptt.frames;
+    c.ptt = null;
+    const total = frames.reduce((n, f) => n + f.length, 0);
+    const audio = new Int16Array(total);
+    let at = 0;
+    for (const f of frames) {
+      audio.set(f, at);
+      at += f.length;
+    }
+    const ms = (total / (c.ctx?.sampleRate || 16000)) * 1000;
+    const tooShort = ms < 250;
+    if (!tooShort) c.utterances.push({ audio, ms });
+    dispatch(c, { type: 'SPEECH_END', tooShort });
+  }
+
+  function interrupt() {
+    if (call) dispatch(call, { type: 'TAP_INTERRUPT' });
+  }
+
+  function toggleMute() {
+    if (call) dispatch(call, { type: call.muted ? 'UNMUTE' : 'MUTE' });
+  }
+
+  function setTool(name) {
+    if (!call) return;
+    call.tool = call.tool === name ? null : name;
+    render(call);
+  }
+
+  // The model that answers a voice turn: your pick, else the fastest one that doesn't reason
+  function modelFor(tool) {
+    const ids = (state.models || []).map(m => m.id);
+    const chosen = settings().llmModel;
+    let id = ids.includes(chosen) ? chosen : VOICE_MODEL_PREFERENCE.find(m => ids.includes(m)) || state.settings.model;
+    if (tool && !supportsTools(id)) id = TOOL_MODEL;
+    return id;
+  }
+
+  // ---------- Wiring ----------
+
+  window.VoiceUI = { start, end, interrupt, toggle: () => (call ? end() : start()), isActive: () => !!call, modelFor, systemNote: () => VOICE_NOTE, onDelta, onTool, onDone, onError };
+
+  $('voice-chat-btn')?.addEventListener('click', () => window.VoiceUI.toggle());
+  $('voice-orb').addEventListener('click', () => { if (settings().mode !== 'push') interrupt(); });
+  $('voice-orb').addEventListener('pointerdown', () => { if (settings().mode === 'push') pttStart(); });
+  addEventListener('pointerup', () => { if (settings().mode === 'push') pttEnd(); });
+  $('voice-interrupt').addEventListener('click', interrupt);
+  $('voice-mute').addEventListener('click', toggleMute);
+  $('voice-end').addEventListener('click', end);
+  $('voice-web').addEventListener('click', () => setTool('web'));
+  $('voice-code').addEventListener('click', () => setTool('code'));
+
+  // Capture phase, so Esc and Space belong to the call while it is open
+  document.addEventListener('keydown', e => {
+    if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'v') {
+      e.preventDefault();
+      window.VoiceUI.toggle();
+      return;
+    }
+    if (!call) return;
+    const typing = /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement?.tagName || '');
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      e.stopPropagation();
+      if (call.S.phase === 'THINKING' || call.S.phase === 'SPEAKING') interrupt();
+      else end();
+    } else if ((e.key === ' ' || e.code === 'Space') && !typing) {
+      e.preventDefault();
+      e.stopPropagation();
+      if (settings().mode === 'push') {
+        if (!e.repeat) pttStart();
+      } else interrupt();
+    } else if (e.key.toLowerCase() === 'm' && !typing && !e.ctrlKey && !e.altKey) {
+      e.preventDefault();
+      toggleMute();
+    }
+  }, true);
+
+  document.addEventListener('keyup', e => {
+    if (call && (e.key === ' ' || e.code === 'Space') && settings().mode === 'push') {
+      e.preventDefault();
+      pttEnd();
+    }
+  }, true);
+
+  addEventListener('beforeunload', () => { if (call) finish(call); });
+
+  // ---------- Settings page ----------
+
+  const pickers = {};
+  const saveVoice = patch => saveSetting({ voiceChat: { ...settings(), ...patch } });
+
+  function dropdown(slotId, key, options, parse = v => v) {
+    const picker = createDropdown({ options, onChange: v => saveVoice({ [key]: parse(v) }) });
+    $(slotId).appendChild(picker.el);
+    pickers[key] = picker;
+  }
+
+  function toggle(id, key) {
+    $(id).addEventListener('click', () => saveVoice({ [key]: !settings()[key] }).then(syncSettings));
+  }
+
+  function buildSettings() {
+    if (pickers.voice) return;
+    const voices = [['autumn', 'Autumn', 'Warm, female'], ['diana', 'Diana', 'Clear, female'], ['hannah', 'Hannah', 'Bright, female'], ['austin', 'Austin', 'Relaxed, male'], ['daniel', 'Daniel', 'Steady, male'], ['troy', 'Troy', 'Deep, male']];
+    dropdown('vc-voice-dropdown', 'voice', voices.map(([value, label, description]) => ({ value, label, description })));
+    dropdown('vc-llm-dropdown', 'llmModel', [{ value: '', label: 'Automatic', description: 'The fastest model that answers without a reasoning phase' }]);
+    dropdown('vc-mode-dropdown', 'mode', [
+      { value: 'handsfree', label: 'Hands-free', description: 'Boltchat listens for you to speak and pause' },
+      { value: 'push', label: 'Push to talk', description: 'Hold Space or the orb while you speak' }
+    ]);
+    dropdown('vc-headphones-dropdown', 'headphones', [
+      { value: 'auto', label: 'Automatic' }, { value: 'on', label: 'I am wearing headphones' }, { value: 'off', label: 'I am using speakers' }
+    ]);
+    dropdown('vc-pause-dropdown', 'endOfSpeechMs', [
+      { value: '500', label: 'Quick', hint: '0.5 s' }, { value: '700', label: 'Normal', hint: '0.7 s' }, { value: '1000', label: 'Patient', hint: '1 s' }
+    ], Number);
+    dropdown('vc-cap-dropdown', 'speakCapChars', [
+      { value: '500', label: 'Short', hint: 'about half a minute' }, { value: '900', label: 'Normal', hint: 'about a minute' }, { value: '2000', label: 'Long', hint: 'about two minutes' }, { value: '5000', label: 'No limit' }
+    ], Number);
+    dropdown('vc-autoend-dropdown', 'autoEndSec', [
+      { value: '60', label: '1 minute' }, { value: '120', label: '2 minutes' }, { value: '300', label: '5 minutes' }, { value: '0', label: 'Never' }
+    ], Number);
+    toggle('vc-interrupt-switch', 'interruptByVoice');
+    toggle('vc-captions-switch', 'captions');
+    toggle('vc-filler-switch', 'filler');
+    toggle('vc-fallback-switch', 'fallbackTts');
+  }
+
+  function syncSettings() {
+    const v = settings();
+    pickers.voice.setValue(v.voice);
+    pickers.mode.setValue(v.mode);
+    pickers.headphones.setValue(v.headphones || 'auto');
+    pickers.endOfSpeechMs.setValue(String(v.endOfSpeechMs));
+    pickers.speakCapChars.setValue(String(v.speakCapChars));
+    pickers.autoEndSec.setValue(String(v.autoEndSec));
+    for (const [id, key] of [['vc-interrupt-switch', 'interruptByVoice'], ['vc-captions-switch', 'captions'], ['vc-filler-switch', 'filler'], ['vc-fallback-switch', 'fallbackTts']]) {
+      $(id).setAttribute('aria-checked', String(!!v[key]));
+    }
+    // The model list follows what the account offers
+    const options = [{ value: '', label: 'Automatic', description: 'The fastest model that answers without a reasoning phase' }]
+      .concat((state.models || []).map(m => ({ value: m.id, label: m.name || m.id })));
+    if (pickers.llmModel.setOptions) pickers.llmModel.setOptions(options);
+    pickers.llmModel.setValue(v.llmModel || '');
+  }
+
+  window.renderVoiceChatSettings = () => {
+    buildSettings();
+    syncSettings();
+  };
+})();

@@ -1,1 +1,222 @@
-(function(c,I){const i=I();typeof module=="object"&&module.exports?module.exports=i:c.ConversationHistory=i})(typeof globalThis<"u"?globalThis:window,()=>{function c(){return`${Date.now().toString(36)}${Math.random().toString(36).slice(2,9)}`}function I(e,n){return[...new Set(Array.isArray(e)?e:[])].filter(s=>!!n[s])}function i(e,n){return n.includes(e)?e:n.at(-1)||null}function y(e,n){const s={schemaVersion:1,rootChildIds:[],rootSelectedChildId:null,nodes:{}};let o=null;for(const d of Array.isArray(e)?e:[]){const t=n(),r={...d,nodeId:t,parentId:o,childIds:[],selectedChildId:null};s.nodes[t]=r,o?(s.nodes[o].childIds.push(t),s.nodes[o].selectedChildId=t):(s.rootChildIds.push(t),s.rootSelectedChildId=t),o=t}return s}function S(e){const n=e.nodes&&typeof e.nodes=="object"?e.nodes:{};e.nodes=n,e.schemaVersion=1;for(const[o,d]of Object.entries(n))d.nodeId=o,d.parentId=d.parentId&&n[d.parentId]?d.parentId:null,d.childIds=I(d.childIds,n).filter(t=>n[t].parentId===o);for(const[o,d]of Object.entries(n))d.parentId&&!n[d.parentId].childIds.includes(o)&&n[d.parentId].childIds.push(o);const s=Object.values(n).filter(o=>!o.parentId).map(o=>o.nodeId);e.rootChildIds=I(e.rootChildIds,n).filter(o=>!n[o].parentId);for(const o of s)e.rootChildIds.includes(o)||e.rootChildIds.push(o);e.rootSelectedChildId=i(e.rootSelectedChildId,e.rootChildIds);for(const o of Object.values(n))o.selectedChildId=i(o.selectedChildId,o.childIds)}function u(e){const n=e.history;if(!n)return e.messages||=[],e.messages;S(n);const s=[],o=new Set;let d=n.rootSelectedChildId;for(;d&&n.nodes[d]&&!o.has(d);){o.add(d);const t=n.nodes[d];s.push(t),d=t.selectedChildId}return e.messages=s,s}function l(e,n=c){const s=!!(e.history&&e.history.schemaVersion===1&&e.history.nodes&&typeof e.history.nodes=="object");return s||(e.history=y(e.messages,n)),u(e),{chat:e,migrated:!s}}function m(e,n){let s=n();for(;e.nodes[s];)s=n();return s}function g(e,n,s,o=c){l(e,o);const d=e.history,t=s===void 0?e.messages.at(-1)?.nodeId||null:s;if(t&&!d.nodes[t])throw new Error(`Conversation parent does not exist: ${t}`);const r=m(d,o),f={...n,nodeId:r,parentId:t,childIds:[],selectedChildId:null};if(d.nodes[r]=f,t){const C=d.nodes[t];C.childIds.push(r),C.selectedChildId=r}else d.rootChildIds.push(r),d.rootSelectedChildId=r;return u(e),f}function a(e,n){return e.history?.nodes?.[n]||null}function h(e,n){l(e);const s=a(e,n);if(!s)return{nodeIds:[],index:-1,count:0};const o=s.parentId?e.history.nodes[s.parentId].childIds:e.history.rootChildIds,d=o.indexOf(n);return{nodeIds:[...o],index:d,count:o.length}}function b(e,n,s){const o=h(e,n),d=Math.max(0,Math.min(o.count-1,o.index+s)),t=o.nodeIds[d];if(!t||t===n)return{...o,changed:!1,nodeId:n};const r=a(e,n);return r.parentId?e.history.nodes[r.parentId].selectedChildId=t:e.history.rootSelectedChildId=t,u(e),{nodeIds:o.nodeIds,index:d,count:o.count,changed:!0,nodeId:t}}function O(e){return l(e),Object.values(e.history.nodes)}function w(e){l(e);const n=e.messages.map(s=>{const{nodeId:o,parentId:d,childIds:t,selectedChildId:r,...f}=s;return f});return{...e,messages:n}}return{SCHEMA_VERSION:1,normalize:l,rebuild:u,append:g,node:a,versionInfo:h,selectSibling:b,allMessages:O,forStorage:w}});
+(function exposeConversationHistory(globalScope, factory) {
+  const api = factory();
+  if (typeof module === 'object' && module.exports) module.exports = api;
+  else globalScope.ConversationHistory = api;
+})(typeof globalThis !== 'undefined' ? globalThis : window, () => {
+  const SCHEMA_VERSION = 1;
+
+  function fallbackId() {
+    return `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 9)}`;
+  }
+
+  function uniqueIds(ids, nodes) {
+    return [...new Set(Array.isArray(ids) ? ids : [])].filter(id => !!nodes[id]);
+  }
+
+  function selectedOrNewest(selectedId, childIds) {
+    return childIds.includes(selectedId) ? selectedId : childIds.at(-1) || null;
+  }
+
+  function createLinearHistory(messages, createId) {
+    const graph = {
+      schemaVersion: SCHEMA_VERSION,
+      rootChildIds: [],
+      rootSelectedChildId: null,
+      nodes: {}
+    };
+    let parentId = null;
+    for (const message of Array.isArray(messages) ? messages : []) {
+      const nodeId = createId();
+      const node = {
+        ...message,
+        nodeId,
+        parentId,
+        childIds: [],
+        selectedChildId: null
+      };
+      graph.nodes[nodeId] = node;
+      if (parentId) {
+        graph.nodes[parentId].childIds.push(nodeId);
+        graph.nodes[parentId].selectedChildId = nodeId;
+      } else {
+        graph.rootChildIds.push(nodeId);
+        graph.rootSelectedChildId = nodeId;
+      }
+      parentId = nodeId;
+    }
+    return graph;
+  }
+
+  function repairGraph(graph) {
+    const nodes = graph.nodes && typeof graph.nodes === 'object' ? graph.nodes : {};
+    graph.nodes = nodes;
+    graph.schemaVersion = SCHEMA_VERSION;
+
+    for (const [nodeId, node] of Object.entries(nodes)) {
+      node.nodeId = nodeId;
+      node.parentId = node.parentId && nodes[node.parentId] ? node.parentId : null;
+      node.childIds = uniqueIds(node.childIds, nodes)
+        .filter(childId => nodes[childId].parentId === nodeId);
+    }
+
+    for (const [nodeId, node] of Object.entries(nodes)) {
+      if (node.parentId && !nodes[node.parentId].childIds.includes(nodeId)) {
+        nodes[node.parentId].childIds.push(nodeId);
+      }
+    }
+
+    const rootCandidates = Object.values(nodes)
+      .filter(node => !node.parentId)
+      .map(node => node.nodeId);
+    graph.rootChildIds = uniqueIds(graph.rootChildIds, nodes)
+      .filter(nodeId => !nodes[nodeId].parentId);
+    for (const nodeId of rootCandidates) {
+      if (!graph.rootChildIds.includes(nodeId)) graph.rootChildIds.push(nodeId);
+    }
+
+    graph.rootSelectedChildId = selectedOrNewest(
+      graph.rootSelectedChildId,
+      graph.rootChildIds
+    );
+    for (const node of Object.values(nodes)) {
+      node.selectedChildId = selectedOrNewest(node.selectedChildId, node.childIds);
+    }
+  }
+
+  function rebuild(chat) {
+    const graph = chat.history;
+    if (!graph) {
+      chat.messages ||= [];
+      return chat.messages;
+    }
+    repairGraph(graph);
+    const messages = [];
+    const seen = new Set();
+    let nodeId = graph.rootSelectedChildId;
+    while (nodeId && graph.nodes[nodeId] && !seen.has(nodeId)) {
+      seen.add(nodeId);
+      const node = graph.nodes[nodeId];
+      messages.push(node);
+      nodeId = node.selectedChildId;
+    }
+    chat.messages = messages;
+    return messages;
+  }
+
+  function normalize(chat, createId = fallbackId) {
+    const hasGraph = !!(
+      chat.history &&
+      chat.history.schemaVersion === SCHEMA_VERSION &&
+      chat.history.nodes &&
+      typeof chat.history.nodes === 'object'
+    );
+    if (!hasGraph) chat.history = createLinearHistory(chat.messages, createId);
+    rebuild(chat);
+    return { chat, migrated: !hasGraph };
+  }
+
+  function newNodeId(graph, createId) {
+    let nodeId = createId();
+    while (graph.nodes[nodeId]) nodeId = createId();
+    return nodeId;
+  }
+
+  function append(chat, message, parentId, createId = fallbackId) {
+    normalize(chat, createId);
+    const graph = chat.history;
+    const resolvedParentId = parentId === undefined
+      ? chat.messages.at(-1)?.nodeId || null
+      : parentId;
+    if (resolvedParentId && !graph.nodes[resolvedParentId]) {
+      throw new Error(`Conversation parent does not exist: ${resolvedParentId}`);
+    }
+
+    const nodeId = newNodeId(graph, createId);
+    const node = {
+      ...message,
+      nodeId,
+      parentId: resolvedParentId,
+      childIds: [],
+      selectedChildId: null
+    };
+    graph.nodes[nodeId] = node;
+    if (resolvedParentId) {
+      const parent = graph.nodes[resolvedParentId];
+      parent.childIds.push(nodeId);
+      parent.selectedChildId = nodeId;
+    } else {
+      graph.rootChildIds.push(nodeId);
+      graph.rootSelectedChildId = nodeId;
+    }
+    rebuild(chat);
+    return node;
+  }
+
+  function node(chat, nodeId) {
+    return chat.history?.nodes?.[nodeId] || null;
+  }
+
+  function versionInfo(chat, nodeId) {
+    normalize(chat);
+    const current = node(chat, nodeId);
+    if (!current) return { nodeIds: [], index: -1, count: 0 };
+    const nodeIds = current.parentId
+      ? chat.history.nodes[current.parentId].childIds
+      : chat.history.rootChildIds;
+    const index = nodeIds.indexOf(nodeId);
+    return { nodeIds: [...nodeIds], index, count: nodeIds.length };
+  }
+
+  function selectSibling(chat, nodeId, delta) {
+    const info = versionInfo(chat, nodeId);
+    const targetIndex = Math.max(0, Math.min(info.count - 1, info.index + delta));
+    const targetId = info.nodeIds[targetIndex];
+    if (!targetId || targetId === nodeId) return { ...info, changed: false, nodeId };
+    const current = node(chat, nodeId);
+    if (current.parentId) {
+      chat.history.nodes[current.parentId].selectedChildId = targetId;
+    } else {
+      chat.history.rootSelectedChildId = targetId;
+    }
+    rebuild(chat);
+    return {
+      nodeIds: info.nodeIds,
+      index: targetIndex,
+      count: info.count,
+      changed: true,
+      nodeId: targetId
+    };
+  }
+
+  function allMessages(chat) {
+    normalize(chat);
+    return Object.values(chat.history.nodes);
+  }
+
+  function forStorage(chat) {
+    normalize(chat);
+    const messages = chat.messages.map(message => {
+      const {
+        nodeId,
+        parentId,
+        childIds,
+        selectedChildId,
+        ...legacyMessage
+      } = message;
+      return legacyMessage;
+    });
+    return { ...chat, messages };
+  }
+
+  return {
+    SCHEMA_VERSION,
+    normalize,
+    rebuild,
+    append,
+    node,
+    versionInfo,
+    selectSibling,
+    allMessages,
+    forStorage
+  };
+});

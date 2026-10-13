@@ -56,7 +56,8 @@ A dependency-free static site — no build step, no framework, no tracking.
 ├── app-demo.css        The live app demos: Boltchat recreated in HTML/CSS, sharp at any size
 ├── phone-demo.css       The Android demo on android.html: the app in a phone frame, played by the same step player
 ├── site.js             Progressive enhancements: navbar, scroll reveal, demos, TOC
-├── app/                The Boltchat web app (built output; see below)
+├── chat.html           The web chat: Boltchat in the browser, inside the site's header and footer
+├── app/                The chat itself (plain HTML, CSS and JS; see below)
 ├── assets/             Icon, social image, leadership photo
 ├── scripts/             SEO validation and IndexNow notification
 ├── .github/workflows/   Automated SEO checks and discovery notification
@@ -64,14 +65,16 @@ A dependency-free static site — no build step, no framework, no tracking.
 └── CNAME               Custom domain for GitHub Pages
 ```
 
-### The web app (`app/`)
+### The web chat (`chat.html` and `app/`)
 
-`app/` is the Boltchat web app, served at https://boltchat.harshit-garg.com/app/. It is **built output**: don't edit it here.
-It is produced from the app's own repository with `node web/build.js --out ../boltchat-site/app`, which bundles the desktop
-app's chat engine for the browser. It has no backend: chats, memories, project files and the API key stay in the visitor's
-browser, and the page's content security policy only allows requests to this site and `api.groq.com`.
+`chat.html` is a normal page of this site. It shows `app/index.html`, the chat, in a frame, so the chat's styles and the
+site's stay apart. Like the rest of the site, `app/` is plain static files with no build step: edit them and push.
+[`app/README.md`](app/README.md) says what each file is.
 
-Because the web app stores its data on this origin, **no page on this site may load third-party scripts** (analytics, CDNs,
+The chat has no backend. Chats, memories, project files and the API key stay in the visitor's browser, and the page's
+content security policy only allows requests to this site and `api.groq.com`.
+
+Because the chat stores its data on this origin, **no page on this site may load third-party scripts** (analytics, CDNs,
 widgets): any script running on the origin could read that data.
 
 ### Preview locally
