@@ -357,7 +357,29 @@ code { font: 0.9em "Cascadia Code", Consolas, monospace; padding: 1px 6px; borde
 @keyframes shine { to { background-position: -250% 0; } }
 .hero .lede { color: var(--muted); font-size: 1.2em; max-width: 640px; margin: 0 auto 34px; }
 .cta { display: inline-flex; flex-wrap: wrap; gap: 14px; justify-content: center; }
+.hero .cta .btn { height: 48px; padding: 0 24px; }
+/* Secondary hero links: quieter than the two main ways in */
+.cta-more {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
+  gap: 6px 18px;
+  margin-top: 22px;
+}
+.cta-more a {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 4px;
+  color: var(--muted, var(--text));
+  font-weight: 600;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: color 0.2s, border-color 0.2s;
+}
+.cta-more a span { transition: transform 0.2s; }
+.cta-more a:hover { color: var(--text); border-bottom-color: var(--accent); }
+.cta-more a[href^="#"]:hover span { transform: translateY(2px); }
+.cta-more a:not([href^="#"]):hover span { transform: translateX(3px); }
+.cta-more .sep { width: 4px; height: 4px; border-radius: 50%; background: var(--faint); }
 .fine { color: var(--faint); font-size: 0.86em; margin-top: 18px; }
+.cta-more + .fine { margin-top: 10px; }
 
 /* Screenshot in a window frame; tilts upright as it scrolls into view (see site.js) */
 .stage { perspective: 1400px; margin: 64px auto 0; max-width: 1000px; }
