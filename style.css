@@ -358,6 +358,23 @@ code { font: 0.9em "Cascadia Code", Consolas, monospace; padding: 1px 6px; borde
 .hero .lede { color: var(--muted); font-size: 1.2em; max-width: 640px; margin: 0 auto 34px; }
 .cta { display: inline-flex; flex-wrap: wrap; gap: 14px; justify-content: center; }
 .hero .cta .btn { height: 48px; padding: 0 24px; }
+.browser-cta {
+  background: var(--bg-solid);
+  border-color: var(--border-strong);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+.browser-cta > svg { color: var(--muted); flex-shrink: 0; }
+.browser-cta > span { margin-left: 8px; color: var(--muted); transition: transform 0.2s, color 0.2s; }
+.browser-cta:hover, .browser-cta:focus-visible {
+  background: var(--bg-elev);
+  border-color: var(--accent);
+  box-shadow: 0 6px 20px -12px var(--glow);
+}
+.browser-cta:hover > span, .browser-cta:focus-visible > span { color: var(--accent); transform: translateX(3px); }
+@media (prefers-reduced-motion: reduce) {
+  .browser-cta, .browser-cta > span { transition: none; }
+  .browser-cta:hover, .browser-cta:hover > span, .browser-cta:focus-visible > span { transform: none; }
+}
 /* Secondary hero links: quieter than the two main ways in */
 .cta-more {
   display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
