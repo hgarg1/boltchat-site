@@ -105,12 +105,17 @@ document.querySelectorAll('.card').forEach(card => {
 // Hero screenshot tilts upright as you scroll
 const tilted = document.querySelector('.stage .window');
 if (tilted && !reduceMotion) {
+  // A gentle 6deg lean, measured at most once per frame
+  let queued = false;
   const update = () => {
+    queued = false;
     const r = tilted.getBoundingClientRect();
     const progress = Math.min(1, Math.max(0, 1 - (r.top - innerHeight * 0.15) / (innerHeight * 0.6)));
-    tilted.style.transform = `rotateX(${(1 - progress) * 18}deg) scale(${0.96 + progress * 0.04})`;
+    tilted.style.transform = progress === 1 ? 'none' : `rotateX(${(1 - progress) * 6}deg) scale(${0.985 + progress * 0.015})`;
   };
-  addEventListener('scroll', update, { passive: true });
+  addEventListener('scroll', () => {
+    if (!queued) { queued = true; requestAnimationFrame(update); }
+  }, { passive: true });
   update();
 }
 
